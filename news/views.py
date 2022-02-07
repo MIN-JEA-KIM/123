@@ -6,18 +6,30 @@ from .models import *
 import logging
 logger = logging.getLogger('news')
 
+# -2022.02.07 park_jong_won add {def scrollLog, import datetime} del {def log}
+from datetime import datetime
+
+def scrollLog(req):
+    if req.method == 'POST':
+        # form = req.POST      
+        # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        new_scroll_data = ScrollData(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
+        new_scroll_data.save()
+    else:
+        # logger.info("GET log")
+        new_log = Log(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path())
+        new_log.save()
 
 # Create your views here.
 def index(req):
 
+    scrollLog(req)
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = "select * from News n inner join N_summarization_one nso on n.n_id = nso.n_id"
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -31,6 +43,14 @@ def index(req):
 
 
 def author(req):
+
+    if req.method == 'POST':
+        # form = TestForm(req.POST)
+        form = req.POST
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+    else:
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+
     # post_latest = Post.objects.order_by("-createDate")[:6]
     context = {
         # "post_latest": post_latest
@@ -44,11 +64,9 @@ def politics(req): # 정치
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
         select * 
@@ -68,16 +86,14 @@ def politics(req): # 정치
     return render(req, "politics.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
-def post(req): # 경제
+def economy(req): # 경제
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
         select * 
@@ -94,19 +110,17 @@ def post(req): # 경제
 
     # return render(req, "index.html", {'banner': ns})
 
-    return render(req, "post.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "economy.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
-def business(req): # 사회
+def society(req): # 사회
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
         select * 
@@ -123,18 +137,17 @@ def business(req): # 사회
 
     # return render(req, "index.html", {'banner': ns})
 
-    return render(req, "business.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "society.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
-def sports(req): # 생활문화
+def life(req): # 생활문화
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
         select * 
@@ -151,19 +164,17 @@ def sports(req): # 생활문화
 
     # return render(req, "index.html", {'banner': ns})
 
-    return render(req, "sports.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "life.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
-def art(req): # IT/과학
+def IT(req): # IT/과학
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
         select * 
@@ -180,7 +191,7 @@ def art(req): # IT/과학
 
     # return render(req, "index.html", {'banner': ns})
 
-    return render(req, "art.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "IT.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
 def world(req): # 세계
@@ -188,11 +199,9 @@ def world(req): # 세계
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
         select * 
@@ -213,6 +222,14 @@ def world(req): # 세계
 
 
 def travel(req):
+
+    if req.method == 'POST':
+        # form = TestForm(req.POST)
+        form = req.POST
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+    else:
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+
     # post_latest = Post.objects.order_by("-createDate")[:6]
     context = {
         # "post_latest": post_latest
@@ -226,11 +243,9 @@ def contactus(req):
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info("index GET log test")
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
         select * 
@@ -272,7 +287,13 @@ def banner3(req):
 
 def index(req):
 
-    log(req)
+    if req.method == 'POST':
+        # form = TestForm(req.POST)
+        form = req.POST
+        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+    else:
+        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+
     query100 = want_category(100)
     news_list100 = News.objects.raw(query100) #models.py Board 클래스의 모든 객체를 board_list에 담음
     query101 = want_category(101)
@@ -315,6 +336,7 @@ def index(req):
 
 
 def want_category(c_id):
+    
     query = f"""
         select n.n_id, p_id, n.cd_id, n_title, nd_img, n_input, o_link, nso_id, nso_content, c_id 
         from News n 
@@ -324,12 +346,10 @@ def want_category(c_id):
     return query
 
 
-def log(req):
-    if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-
-        logger.info(f"index POST log test => [scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        # logger.info(f"index POST log test")
-    else:
-        logger.info("index GET log test")
+# def log(req):
+#     if req.method == 'POST':
+#         # form = TestForm(req.POST)
+#         form = req.POST
+#         logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+#     else:
+#         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")

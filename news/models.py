@@ -68,3 +68,24 @@ class Press(models.Model):
     class Meta:
         managed = False
         db_table = 'Press'
+
+# 2022-02-07 park-jong-won  add ScrollData,Log
+class ScrollData(models.Model):
+    ipaddr = models.CharField(max_length=15)
+    acstime = models.DateTimeField(auto_now = True)
+    url = models.CharField(db_column='URL', max_length=45)  # Field name made lowercase.
+    staytime = models.IntegerField()
+    scroll = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'Scroll_Data'
+
+class Log(models.Model):
+    ipaddr = models.CharField(db_column='IPaddr', max_length=15, db_collation='utf8_general_ci', blank=True, null=True)  # Field name made lowercase.
+    acstime = models.DateTimeField(blank=True, null=True, auto_now = True)
+    url = models.CharField(db_column='URL', max_length=45, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'Log'
