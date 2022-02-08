@@ -21,28 +21,30 @@ def scrollLog(req):
         new_log.save()
 
 # Create your views here.
-def index(req):
+# def index(req):
 
-    scrollLog(req)
-    if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-    else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+#     scrollLog(req)
+#     if req.method == 'POST':
+#         # form = TestForm(req.POST)
+#         form = req.POST
+#         logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+#     else:
+#         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
-    query = "select * from News n inner join N_summarization_one nso on n.n_id = nso.n_id"
-    news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
-    # news_list 페이징 처리
-    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
-    paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
-    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+#     query = "select * from News n inner join N_summarization_one nso on n.n_id = nso.n_id"
+#     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
+#     # news_list 페이징 처리
+#     page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
+#     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+#     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
-    return render(req, "index.html", {'page_obj': page_obj, 'news_list': news_list})
+#     # return render(req, "index.html", {'banner': ns})
+#     return render(req, "index.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
 def author(req):
+
+    scrollLog(req)
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
@@ -60,6 +62,8 @@ def author(req):
 
 
 def politics(req): # 정치
+
+    scrollLog(req)
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
@@ -88,6 +92,8 @@ def politics(req): # 정치
 
 def economy(req): # 경제
 
+    scrollLog(req)
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
@@ -114,6 +120,8 @@ def economy(req): # 경제
 
 
 def society(req): # 사회
+
+    scrollLog(req)
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
@@ -142,6 +150,8 @@ def society(req): # 사회
 
 def life(req): # 생활문화
 
+    scrollLog(req)
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
@@ -169,6 +179,8 @@ def life(req): # 생활문화
 
 def IT(req): # IT/과학
 
+    scrollLog(req)
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
@@ -195,6 +207,8 @@ def IT(req): # IT/과학
 
 
 def world(req): # 세계
+
+    scrollLog(req)
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
@@ -238,7 +252,9 @@ def travel(req):
     return render(req, "travel.html", context=context)
 
 
-def contactus(req):
+def news_post(req, n_id):
+
+    scrollLog(req)
 
     if req.method == 'POST':
         # form = TestForm(req.POST)
@@ -248,21 +264,24 @@ def contactus(req):
         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
-        select * 
+        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link
         from News n 
-        inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
+        inner join N_content nc on n.n_id = nc.n_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 102
+        where n.n_id ={n_id} 
     """
-    news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
-    # news_list 페이징 처리
-    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
-    paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
-    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
-
+    # query = f"""
+    #     select *
+    #     from News n 
+    #     inner join N_content nc on n.n_id = nc.n_id 
+    #     inner join N_summarization_one nso on n.n_id = nso.n_id
+    #     where n.n_id = {n_id} 
+    # """
+    news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
+    
     # return render(req, "index.html", {'banner': ns})
 
-    return render(req, "contactus.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "news_post.html", {'news': news})
 
 
 def banner1(req):
@@ -286,6 +305,8 @@ def banner3(req):
     return render(req, 'banner1.html', {'banner3': ns})
 
 def index(req):
+
+    scrollLog(req)
 
     if req.method == 'POST':
         # form = TestForm(req.POST)

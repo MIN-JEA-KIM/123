@@ -71,7 +71,7 @@
                         <p>
                           {{ news.nso_content }}
                         </p>
-                        <a href="{% url 'travel' %}" class="font-weight-bold text-dark pt-2">Read Article</a>
+                        <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
                       </div>
                     </div>
                     {% endif %}
