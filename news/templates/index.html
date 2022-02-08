@@ -83,74 +83,76 @@
           </div>
           <div class="row">
             <div class="owl-carousel owl-theme" id="main-banner-carousel">
+              {% for banner in banners %}
               <div class="item">
                 <div class="carousel-content-wrapper mb-2">
                   <div class="carousel-content">
                     <h1 class="font-weight-bold">
-                      <a class="nav-link" href="{% url 'banner1' %}">진중권 “오픈북? 그렇다고 부모가 보진 않아” 유시민 “모든 정보, 검찰의 주장”</a>
+                      <a class="nav-link" href="{% url 'news_post' banner.n_id %}">
+                        {{ banner.n_title }}
+                      </a>
                     </h1>
                     <h5 class="font-weight-normal  m-0">
-                      <p style="color:black;">{{ banner }}</p>
+                      <p style="color:black;">{{ banner.n_input }}</p>
                     </h5>
                   </div>
                   <div class="carousel-image">
                     <img
-                      src="https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/202001/02/b005b352-279a-4fa7-9a1c-7c07353fc3d2.jpg"
+                      src="{{ banner.nd_img }}"
                       alt="" />
                   </div>
                 </div>
               </div>
-              <div class="item">
-                <div class="carousel-content-wrapper mb-2">
-                  <div class="carousel-content">
-                    <h1 class="font-weight-bold">
-                      <a class="nav-link" href="{% url 'banner1' %}">강원, 새해 첫날부터 산불·추락사 등 사건사고 잇따라</a>
-                    </h1>
-                    <h5 class="font-weight-normal  m-0">
-                      <p style="color:black;">{{ banner }}</p>
-                    </h5>
-                  </div>
-                  <div class="carousel-image">
-                    <img
-                      src="https://imgnews.pstatic.net/image/003/2020/01/01/NISI20200101_0000455879_web_20200101231840_20200101232403833.jpg?type=w647"
-                      alt="" />
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="carousel-content-wrapper mb-2">
-                  <div class="carousel-content">
-                    <h1 class="font-weight-bold">
-                      <a class="nav-link" href="{% url 'banner1' %}">부산 사하구 신평동 강변대로서 4중 추돌…2명 부상</a>
-                    </h1>
-                    <h5 class="font-weight-normal  m-0">
-                      <p style="color:black;">{{ banner }}</p>
-                    </h5>
-                  </div>
-                  <div class="carousel-image">
-                    <img
-                      src="https://imgnews.pstatic.net/image/214/2020/01/01/0001004439_001_20200101221504575.jpg?type=w647"
-                      alt="" />
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="carousel-content-wrapper mb-2">
-                  <div class="carousel-content">
-                    <h1 class="font-weight-bold">
-                      <a class="nav-link" href="{% url 'banner1' %}">동해해경청, 새해첫날 독도 해상서 조업중 50대 뇌출혈 환자 긴급 이송</a>
-                    </h1>
-                    <h5 class="font-weight-normal  m-0">
-                      <p style="color:black;">{{ banner }}</p>
-                    </h5>
-                  </div>
-                  <div class="carousel-image">
-                    <img
-                      src="https://imgnews.pstatic.net/image/016/2020/01/01/202001012143004648513_20200101215104_01_20200101215301629.jpg?type=w647"
-                      alt="" />
-                  </div>
-                </div>
-              </div>
+              {% endfor %}
+<!--              <div class="item">-->
+<!--                <div class="carousel-content-wrapper mb-2">-->
+<!--                  <div class="carousel-content">-->
+<!--                    <h1 class="font-weight-bold">-->
+<!--                    </h1>-->
+<!--                    <h5 class="font-weight-normal  m-0">-->
+<!--                      <p style="color:black;">{{ banner }}</p>-->
+<!--                    </h5>-->
+<!--                  </div>-->
+<!--                  <div class="carousel-image">-->
+<!--                    <img-->
+<!--                      src="https://imgnews.pstatic.net/image/003/2020/01/01/NISI20200101_0000455879_web_20200101231840_20200101232403833.jpg?type=w647"-->
+<!--                      alt="" />-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="item">-->
+<!--                <div class="carousel-content-wrapper mb-2">-->
+<!--                  <div class="carousel-content">-->
+<!--                    <h1 class="font-weight-bold">-->
+
+<!--                    </h1>-->
+<!--                    <h5 class="font-weight-normal  m-0">-->
+<!--                      <p style="color:black;">{{ banner }}</p>-->
+<!--                    </h5>-->
+<!--                  </div>-->
+<!--                  <div class="carousel-image">-->
+<!--                    <img-->
+<!--                      src="https://imgnews.pstatic.net/image/214/2020/01/01/0001004439_001_20200101221504575.jpg?type=w647"-->
+<!--                      alt="" />-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="item">-->
+<!--                <div class="carousel-content-wrapper mb-2">-->
+<!--                  <div class="carousel-content">-->
+<!--                    <h1 class="font-weight-bold">-->
+<!--                    </h1>-->
+<!--                    <h5 class="font-weight-normal  m-0">-->
+<!--                      <p style="color:black;">{{ banner }}</p>-->
+<!--                    </h5>-->
+<!--                  </div>-->
+<!--                  <div class="carousel-image">-->
+<!--                    <img-->
+<!--                      src="https://imgnews.pstatic.net/image/016/2020/01/01/202001012143004648513_20200101215104_01_20200101215301629.jpg?type=w647"-->
+<!--                      alt="" />-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ logger = logging.getLogger('news')
 # -2022.02.07 park_jong_won add {def scrollLog, import datetime} del {def log}
 from datetime import datetime
 
+
 def scrollLog(req):
     if req.method == 'POST':
         # form = req.POST      
@@ -284,25 +285,31 @@ def news_post(req, n_id):
     return render(req, "news_post.html", {'news': news})
 
 
-def banner1(req):
-    raw = f"select nc_id, n_content from N_content where nc_id = 1"
-    NC = N_content.objects.raw(raw)
-    ns = NC[0].n_content
-    return render(req, 'banner1.html', {'banner1': ns})
+# def banner1(req):
+#     raw = f"select nc_id, n_content from N_content where nc_id = 1"
+#     NC = N_content.objects.raw(raw)
+#     ns = NC[0].n_content
+#     return render(req, 'banner1.html', {'banner1': ns})
+#
+#
+# def banner2(req):
+#     raw = f"select nc_id, n_content from N_content where nc_id = 1"
+#     NC = N_content.objects.raw(raw)
+#     ns = NC[1].n_content
+#     return render(req, 'banner1.html', {'banner2': ns})
+#
+#
+# def banner3(req):
+#     raw = f"select nc_id, n_content from N_content where nc_id = 1"
+#     NC = N_content.objects.raw(raw)
+#     ns = NC[2].n_content
+#     return render(req, 'banner1.html', {'banner3': ns})
 
+# def banner(req):
+#     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' order by n_input desc limit 4"
+#     NC = N_content.objects.raw(raw)
+#     return render(req, 'index.html', {'banners': NC})
 
-def banner2(req):
-    raw = f"select nc_id, n_content from N_content where nc_id = 1"
-    NC = N_content.objects.raw(raw)
-    ns = NC[1].n_content
-    return render(req, 'banner1.html', {'banner2': ns})
-
-
-def banner3(req):
-    raw = f"select nc_id, n_content from N_content where nc_id = 1"
-    NC = N_content.objects.raw(raw)
-    ns = NC[2].n_content
-    return render(req, 'banner1.html', {'banner3': ns})
 
 def index(req):
 
@@ -314,6 +321,9 @@ def index(req):
         logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+
+    raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' order by n_input desc limit 4"
+    NC = N_content.objects.raw(raw)
 
     query100 = want_category(100)
     news_list100 = News.objects.raw(query100) #models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -353,7 +363,7 @@ def index(req):
     paginator105 = Paginator(news_list105, '10')
     page_obj105 = paginator105.page(page105)
 
-    return render(req, "index.html", {'page_obj100':page_obj100, 'news_list100':news_list100, 'page_obj101':page_obj101, 'news_list101':news_list101, 'page_obj102':page_obj102, 'news_list102':news_list102, 'page_obj103':page_obj103, 'news_list103':news_list103, 'page_obj104':page_obj104, 'news_list104':news_list104, 'page_obj105':page_obj105, 'news_list105':news_list105})
+    return render(req, "index.html", {'banners': NC, 'page_obj100':page_obj100, 'news_list100':news_list100, 'page_obj101':page_obj101, 'news_list101':news_list101, 'page_obj102':page_obj102, 'news_list102':news_list102, 'page_obj103':page_obj103, 'news_list103':news_list103, 'page_obj104':page_obj104, 'news_list104':news_list104, 'page_obj105':page_obj105, 'news_list105':news_list105})
 
 
 def want_category(c_id):
