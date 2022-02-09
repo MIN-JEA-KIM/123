@@ -88,11 +88,11 @@
                 <div class="carousel-content-wrapper mb-2">
                   <div class="carousel-content">
                     <h1 class="font-weight-bold">
-                      <a class="nav-link" href="{% url 'news_post' banner.n_id %}">
+                      <a class="nav-link" href="{% url 'news_post' banner.n_id %}" style="color:black;">
                         {{ banner.n_title }}
                       </a>
                     </h1>
-                    <h5 class="font-weight-normal  m-0">
+                    <h5 class="font-weight-normal m-0">
                       <p style="color:black;">{{ banner.n_input }}</p>
                     </h5>
                   </div>
@@ -104,7 +104,10 @@
                 </div>
               </div>
               {% endfor %}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 61d28590f2a65277cec753d52938084294fcc2ec
             </div>
           </div>
         </div>
@@ -139,7 +142,7 @@
                           </div>
                           <div class="col-lg-6">
                             <h1 class="font-weight-600 mt-5">
-                              {{ news.n_title }}
+                              <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                             </h1>
                             <p>
                               {{ news.nso_content }}
@@ -236,7 +239,7 @@
                           </div>
                           <div class="col-lg-6">
                             <h1 class="font-weight-600 mt-5">
-                              {{ news.n_title }}
+                              <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                             </h1>
                             <p>
                               {{ news.nso_content }}
@@ -332,7 +335,7 @@
                           </div>
                           <div class="col-lg-6">
                             <h1 class="font-weight-600 mt-5">
-                              {{ news.n_title }}
+                              <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                             </h1>
                             <p>
                               {{ news.nso_content }}
@@ -429,7 +432,7 @@
                           </div>
                           <div class="col-lg-6">
                             <h1 class="font-weight-600 mt-5">
-                              {{ news.n_title }}
+                              <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                             </h1>
                             <p>
                               {{ news.nso_content }}
@@ -526,7 +529,7 @@
                           </div>
                           <div class="col-lg-6">
                             <h1 class="font-weight-600 mt-5">
-                              {{ news.n_title }}
+                              <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                             </h1>
                             <p>
                               {{ news.nso_content }}
@@ -623,7 +626,7 @@
                           </div>
                           <div class="col-lg-6">
                             <h1 class="font-weight-600 mt-5">
-                              {{ news.n_title }}
+                              <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                             </h1>
                             <p>
                               {{ news.nso_content }}
