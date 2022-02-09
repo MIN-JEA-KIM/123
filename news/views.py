@@ -12,9 +12,16 @@ from datetime import datetime
 
 def scrollLog(req):
     if req.method == 'POST':
-        # form = req.POST      
+        # form = req.POST
         # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        new_scroll_data = ScrollData(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
+        # new_scroll_data = ScrollData(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
+
+        x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split('.')[0]
+            new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
+        else:
+            new_scroll_data = ScrollData(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
         new_scroll_data.save()
     else:
         # logger.info("GET log")
@@ -265,10 +272,10 @@ def news_post(req, n_id):
         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
-        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link
+        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
-        inner join N_summarization_one nso on n.n_id = nso.n_id
+        inner join N_summarization ns on n.n_id = ns.n_id
         where n.n_id ={n_id} 
     """
     # query = f"""
