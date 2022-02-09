@@ -265,10 +265,10 @@ def news_post(req, n_id):
         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
     query = f"""
-        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link
+        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
-        inner join N_summarization_one nso on n.n_id = nso.n_id
+        inner join N_summarization ns on n.n_id = ns.n_id
         where n.n_id ={n_id} 
     """
     # query = f"""
