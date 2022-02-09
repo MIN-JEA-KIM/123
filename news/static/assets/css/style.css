@@ -497,6 +497,11 @@ mark,
   height: 100%;
 }
 
+.img-fluid1 {
+  width: 400;
+  height: 300;
+}
+
 .img-thumbnail {
   padding: 0.25rem;
   background-color: #fff;
