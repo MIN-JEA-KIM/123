@@ -363,7 +363,12 @@ def index(req):
     paginator105 = Paginator(news_list105, '10')
     page_obj105 = paginator105.page(page105)
 
-    return render(req, "index.html", {'banners': NC, 'page_obj100':page_obj100, 'news_list100':news_list100, 'page_obj101':page_obj101, 'news_list101':news_list101, 'page_obj102':page_obj102, 'news_list102':news_list102, 'page_obj103':page_obj103, 'news_list103':news_list103, 'page_obj104':page_obj104, 'news_list104':news_list104, 'page_obj105':page_obj105, 'news_list105':news_list105})
+    return render(req, "index.html", {'banners': NC, 'page_obj100':page_obj100, 'news_list100':news_list100, 
+                                      'page_obj101':page_obj101, 'news_list101':news_list101, 
+                                      'page_obj102':page_obj102, 'news_list102':news_list102, 
+                                      'page_obj103':page_obj103, 'news_list103':news_list103, 
+                                      'page_obj104':page_obj104, 'news_list104':news_list104, 
+                                      'page_obj105':page_obj105, 'news_list105':news_list105})
 
 
 def want_category(c_id):
