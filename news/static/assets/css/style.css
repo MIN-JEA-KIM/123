@@ -497,8 +497,8 @@ mark,
   height: 100%;
 }
 
-.img-fluid3 {
-  width: 400px;
+.img-fluid1 {
+  width: 450px;
   height: 300px;
 }
 
@@ -10483,7 +10483,7 @@ h6, .h6 {
   padding: 14px 16px 14px 25px !important;
   margin: 10px 0;
   border-radius: 96px 0 0px 96px;
-  color: #ffffff;
+  color: #000000;
 }
 
 #main-banner-carousel .owl-dots .owl-dot.active {

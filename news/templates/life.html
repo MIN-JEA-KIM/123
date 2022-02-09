@@ -73,11 +73,11 @@
                   {% if page_number == page_obj.number %}
 
                   {% for news in news_list %}
-                    {% if forloop.counter > page_number|add:-1|mul:3 and forloop.counter <= page_number|mul:3 %}
+                    {% if forloop.counter > page_number|add:-1|mul:10 and forloop.counter <= page_number|mul:10 %}
 
                     <div class="row mb-5">
                       <div class="col-lg-6">
-                        <img src="{{ news.nd_img }}" class="img-fluid" alt="world-news" />
+                        <img src="{{ news.nd_img }}" class="img-fluid1" alt="world-news" />
                       </div>
                       <div class="col-lg-6">
                         <h1 class="font-weight-600 mt-5">
