@@ -63,11 +63,13 @@
                 <h1 class="font-weight-600 mt-5">
                   {{ news.n_title }}
                 </h1>
-                <h1 class="font-weight-600 mt-5">
-                  <a href='{{ news.o_link }}'>원본링크</a>
-                </h1>
+                <h3 class="font-weight-600 mt-5">
+                  <a href='{{ news.o_link }}' style="color:black;">원본링크</a>
+                </h3>
               </div>
                 <img src="{{ news.nd_img }}" class="img-fluid" alt="world-news"/>
+                <br>
+                <br>
                   {{ news.n_content }}
             </div>
           </div>

@@ -498,8 +498,8 @@ mark,
 }
 
 .img-fluid1 {
-  width: 400px;
-  height: 250px;
+  width: 100%;
+  height: 100%;
 }
 
 .img-thumbnail {
