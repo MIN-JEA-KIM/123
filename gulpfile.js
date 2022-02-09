@@ -18,7 +18,7 @@ gulp.task("sass", function() {
     .pipe(sass({ outputStyle: "expanded" }).on("error", sass.logError)
     .pipe(sourcemaps.write("./maps"))
     .pipe(gulp.dest("./assets/css"))
-    .pipe(browserSync.stream());
+    .pipe(browserSync.stream()))
 });
 
 // Static Server + watching scss/html files
