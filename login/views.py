@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from login.models import login
 
+
 def login_page(req):
 
     if req.method == 'GET':
@@ -9,18 +10,19 @@ def login_page(req):
     elif req.method == 'POST':
         username = req.POST.get('username', None)
         password = req.POST.get('password', None)
-        print(username, password)
+        # print(username, password)
 
         res_data = {}
         if not (username and password):
             res_data['error'] = '모든 값을 입력해야 합니다.'
 
         else:
-            raw = f"select * from login where id = '{username}'"
+            raw = f"select * from login where id='{username}'"
             us = login.objects.raw(raw)
 
-            if password == us:
-                pass
+            if password == us[0].password:
+            
+                return render(req, 'index.html', {'username':username, 'password':password})
 
             else:
                 res_data['error'] = '비밀번호가 틀렸습니다.'
