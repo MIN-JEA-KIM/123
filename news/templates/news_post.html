@@ -26,6 +26,12 @@
     <!-- inject:css -->
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <!-- endinject -->
+
+     <!-- Google icon -->
+     <link
+     href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+     rel="stylesheet">
+
     <script type="text/javascript">
       function showClock(){
         var currentDate = new Date();
@@ -77,6 +83,10 @@
                 <br>  
                 <br>
                 {{ news.n_content }}
+                <br>
+                <br>            
+                  <h5>🖱조회수:{{view.view_count}}        
+                    
             </div>
           </div>
         </div>
@@ -102,3 +112,4 @@
     <!-- End custom js for this page-->
   </body>
 </html>
+
