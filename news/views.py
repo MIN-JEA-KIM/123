@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from email.policy import default
 from itertools import product
 from multiprocessing import context
@@ -7,6 +8,11 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
+=======
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from django.contrib.auth.hashers import make_password, check_password
+>>>>>>> 3d3dc18c6fae6891ccdff84f410c05352595d5fc
 from .models import *
 from datetime import datetime
 import logging
@@ -331,7 +337,7 @@ def index(req):
     else:
         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
-    raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' order by n_input desc limit 4"
+    raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
 
     query100 = want_category(100)
@@ -392,4 +398,17 @@ def want_category(c_id):
         inner join N_summarization_one nso on n.n_id = nso.n_id 
         inner join N_category_detail det on n.cd_id = det.cd_id
         where c_id = {c_id}"""
+<<<<<<< HEAD
     return query
+=======
+    return query
+            
+            
+# def log(req):
+#     if req.method == 'POST':
+#         # form = TestForm(req.POST)
+#         form = req.POST
+#         logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+#     else:
+#         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+>>>>>>> 3d3dc18c6fae6891ccdff84f410c05352595d5fc

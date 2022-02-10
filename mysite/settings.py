@@ -40,7 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'news.apps.NewsConfig',
     'mathfilters',
+<<<<<<< HEAD
     'hitcount'
+=======
+    'login.apps.LoginConfig',
+>>>>>>> 3d3dc18c6fae6891ccdff84f410c05352595d5fc
 ]
 
 MIDDLEWARE = [
@@ -123,7 +127,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
