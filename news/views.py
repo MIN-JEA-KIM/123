@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from email.policy import default
 from itertools import product
 from multiprocessing import context
@@ -8,11 +8,9 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
-=======
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.contrib.auth.hashers import make_password, check_password
->>>>>>> 3d3dc18c6fae6891ccdff84f410c05352595d5fc
 from .models import *
 from datetime import datetime
 import logging
@@ -260,7 +258,7 @@ def travel(req):
 
     return render(req, "travel.html", context=context)
 
-def get_client_ip(request):
+def get_client_ip(request): #Ip 가져오기
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[-1].strip()
@@ -278,12 +276,6 @@ def news_post(req, n_id):
     else:
         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
 
-    
-    # view = get_object_or_404(N_content, pk = n_id)
-    # default_view_count = view.view_count
-    # view.view_count = default_view_count + 1
-    # view.save()
-
     view = get_object_or_404(N_content, pk=n_id)
     lp = req.session.get('lp')
 
@@ -299,8 +291,9 @@ def news_post(req, n_id):
             view.view_count = 1
         view.save()
 
+  
     query = f"""
-        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
+        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content, view_count
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
         inner join N_summarization ns on n.n_id = ns.n_id
@@ -310,20 +303,10 @@ def news_post(req, n_id):
 
     context = {
         'news': news,
-        'view': view,
+        'view': view
     }
 
-    # query = f"""
-    #     select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content, view_count
-    #     from News n 
-    #     inner join N_content nc on n.n_id = nc.n_id 
-    #     inner join N_summarization ns on n.n_id = ns.n_id
-    #     where n.n_id ={n_id} 
-    # """
-    # news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
-
-    # return render(req, "news_post.html", {'news': news})
-    # return render(req, "news_post.html", {'news': news, 'view': view})
+    #return render(req, "news_post.html", {'news': news, 'view': view})
     return render(req, 'news_post.html', context)
 
 def index(req):
@@ -397,18 +380,6 @@ def want_category(c_id):
         from News n 
         inner join N_summarization_one nso on n.n_id = nso.n_id 
         inner join N_category_detail det on n.cd_id = det.cd_id
-        where c_id = {c_id}"""
-<<<<<<< HEAD
+        where c_id = {c_id} and n_input != '9999-12-31 00:00:00'
+        order by n_input desc"""
     return query
-=======
-    return query
-            
-            
-# def log(req):
-#     if req.method == 'POST':
-#         # form = TestForm(req.POST)
-#         form = req.POST
-#         logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-#     else:
-#         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
->>>>>>> 3d3dc18c6fae6891ccdff84f410c05352595d5fc

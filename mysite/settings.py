@@ -40,11 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'news.apps.NewsConfig',
     'mathfilters',
-<<<<<<< HEAD
-    'hitcount'
-=======
     'login.apps.LoginConfig',
->>>>>>> 3d3dc18c6fae6891ccdff84f410c05352595d5fc
+
 ]
 
 MIDDLEWARE = [

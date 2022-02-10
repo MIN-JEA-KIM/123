@@ -85,8 +85,16 @@
                 {{ news.n_content }}
                 <br>
                 <br>            
-                  <h5>🖱조회수:{{view.view_count}}        
-                    
+                  <h5>🖱조회수:{{view.view_count}}   
+                    <br>
+                    <!-- 추천 -->
+                    <div class="col-2">
+                      <div class="bg-light text-center p-3 border font-weight-bolder mb-1">
+                      <span class="material-icons-outlined">thumb_up</span>
+                      <a href="{% url 'news_post' news.n_id %}">추천</a>
+                      <em class="">{{news.view_count}}</em>
+                    </div>
+                  </div>
             </div>
           </div>
         </div>
