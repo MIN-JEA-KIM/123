@@ -19,11 +19,8 @@ from django.conf.urls import include
 from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("news/", include("news.urls")),
-    path("login/", include("login.urls")),
-    path("accounts/", include('django.contrib.auth.urls')),
-    path("", RedirectView.as_view(url="/news/", permanent=True)),
+    path('', views.index, name="index"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator
+from django.contrib.auth.hashers import make_password, check_password
 from .models import *
 
 # -2022.01.24 park_jong_won
@@ -375,8 +376,8 @@ def want_category(c_id):
         inner join N_category_detail det on n.cd_id = det.cd_id
         where c_id = {c_id}"""
     return query
-
-
+            
+            
 # def log(req):
 #     if req.method == 'POST':
 #         # form = TestForm(req.POST)
