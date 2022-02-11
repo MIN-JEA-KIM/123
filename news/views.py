@@ -12,16 +12,26 @@ from datetime import datetime
 
 
 def scrollLog(req):
-    # if req.method == 'POST':
-    #     # form = req.POST      
-    #     # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-    #     new_scroll_data = ScrollData(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
-    #     new_scroll_data.save()
-    # else:
-    #     # logger.info("GET log")
-    #     new_log = Log(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path())
-    #     new_log.save()
-    pass
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
+    if req.method == 'POST':
+        # form = req.POST
+        # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
+        new_scroll_data.save()
+        print("save scroll_data")
+    else:
+        # logger.info("GET log")
+        new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
+        new_log.save()
+        print("save log_data")
+
+    print(f"HTTP_X_FORWARDED_FOR = {req.META.get('HTTP_X_FORWARDED_FOR')}, REMOTE_ADDR = {req.META.get('REMOTE_ADDR')}, HTTP_X_REAL_IP = {req.META.get('HTTP_X_REAL_IP')}")
+
 
 # Create your views here.
 # def index(req):
@@ -49,12 +59,19 @@ def author(req):
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+
 
     # post_latest = Post.objects.order_by("-createDate")[:6]
     context = {
@@ -68,12 +85,18 @@ def politics(req): # 정치
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -97,12 +120,18 @@ def economy(req): # 경제
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -126,12 +155,18 @@ def society(req): # 사회
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -155,12 +190,18 @@ def life(req): # 생활문화
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -184,12 +225,18 @@ def IT(req): # IT/과학
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -213,12 +260,18 @@ def world(req): # 세계
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -259,12 +312,18 @@ def news_post(req, n_id):
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
@@ -317,12 +376,18 @@ def index(req):
 
     scrollLog(req)
 
-    # if req.method == 'POST':
-    #     # form = TestForm(req.POST)
-    #     form = req.POST
-    #     logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-    # else:
-    #     logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
+    if req.method == 'POST':
+        # form = TestForm(req.POST)
+        form = req.POST
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+    else:
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
