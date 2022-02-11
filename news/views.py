@@ -27,47 +27,61 @@ logger = logging.getLogger('news')
 
 # -2022.02.07 park_jong_won add {def scrollLog, import datetime} del {def log}
 def scrollLog(req):
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
-        # form = req.POST      
-        # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
         new_scroll_data = ScrollData(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
         new_scroll_data.save()
     else:
-        # logger.info("GET log")
         new_log = Log(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path())
         new_log.save()
 
+    print(f"HTTP_X_FORWARDED_FOR = {req.META.get('HTTP_X_FORWARDED_FOR')}, REMOTE_ADDR = {req.META.get('REMOTE_ADDR')}, HTTP_X_REAL_IP = {req.META.get('HTTP_X_REAL_IP')}")
     return context
 
 def author(req):
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
-    # post_latest = Post.objects.order_by("-createDate")[:6]
     context = {
-        # "post_latest": post_latest
     }
 
-    return render(req, "author.html", context=context)
+    return render(req, "author.html", context)
 
 
 def politics(req): # 정치
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -82,21 +96,27 @@ def politics(req): # 정치
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
+    context = {'page_obj': page_obj, 'news_list': news_list}
 
-    return render(req, "politics.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "politics.html", context)
 
 
 def economy(req): # 경제
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -111,8 +131,6 @@ def economy(req): # 경제
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
-
     return render(req, "economy.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
@@ -120,12 +138,18 @@ def society(req): # 사회
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -140,8 +164,6 @@ def society(req): # 사회
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
-
     return render(req, "society.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
@@ -149,12 +171,18 @@ def life(req): # 생활문화
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -169,8 +197,6 @@ def life(req): # 생활문화
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
-
     return render(req, "life.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
@@ -178,12 +204,18 @@ def IT(req): # IT/과학
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -198,8 +230,6 @@ def IT(req): # IT/과학
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
-
     return render(req, "IT.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
@@ -207,12 +237,18 @@ def world(req): # 세계
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     query = f"""
         select * 
@@ -227,23 +263,28 @@ def world(req): # 세계
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
-
     return render(req, "world.html", {'page_obj': page_obj, 'news_list': news_list})
 
 
 def travel(req):
 
+    scrollLog(req)
+
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
-    # post_latest = Post.objects.order_by("-createDate")[:6]
     context = {
-        # "post_latest": post_latest
+
     }
 
     return render(req, "travel.html", context=context)
@@ -259,12 +300,19 @@ def get_client_ip(request): #Ip 가져오기
 def news_post(req, n_id):
 
     scrollLog(req)
+
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     view = get_object_or_404(N_content, pk=n_id)
     lp = req.session.get('lp')
@@ -321,12 +369,18 @@ def index(req):
 
     scrollLog(req)
 
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
     if req.method == 'POST':
         # form = TestForm(req.POST)
         form = req.POST
-        logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
