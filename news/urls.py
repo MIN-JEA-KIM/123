@@ -2,6 +2,7 @@ from operator import index
 from textwrap import indent
 from django.urls import path
 from . import views
+from .views import *
 
 urlpatterns = [
     path('', views.index, name="index"),
@@ -12,6 +13,6 @@ urlpatterns = [
     path("life/", views.life, name="life"),
     path("IT/", views.IT, name="IT"),
     path("world/", views.world, name="world"),
-    path("travel/", views.travel, name="travel"),
+    path("memberinfo/", views.memberinfo, name="memberinfo"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
 ]

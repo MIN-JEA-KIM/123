@@ -81,11 +81,13 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'world' %}">세계</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/login">로그인</a>
+            <li>
+              <input name="id" type="text" style="text-align:center; width:100px; height:20px">
+              <input name="password" type="password" style="text-align:center; width:100px; height:20px">
+              <input type="submit" value="로그인" style="text-align:center; width:70px; height:30px">
             </li>
-            <li class="nav-item">
-              <a class="nav-link">{{username}}, {{password}}</a>
+            <li>
+              <a class="nav-link" href="{% url 'memberinfo' %}">회원가입</a>
             </li>
           </ul>
         </div>
