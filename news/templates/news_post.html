@@ -55,6 +55,30 @@
         }
         setTimeout(showClock,1000);
       }
+
+      // 추천 버튼 처리
+      $('.recommend').click(function(){
+      var pk = $(this).attr('name') // 클릭한 요소의 attribute 중 name의 값을 가져온다.
+      $.ajax({
+        type: "POST", // 데이터를 전송하는 방법을 지정한다.
+        url: "{% url 'recommend' %}", // 통신할 url을 지정한다.
+        data: {'pk': pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, // 서버로 데이터를 전송할 때 이 옵션을 사용한다.
+        dataType: "json", // 서버측에서 전송한 데이터를 어떤 형식의 데이터로서 해석할 것인가를 지정한다. 없으면 알아서 판단한다.
+        // 서버측에서 전송한 데이터 views.py like 메소드
+        // context = {'likes_count' : memo.total_likes, 'message' : message}
+        // json.dump(context)를 통해서 json 형식으로 전달된다.
+
+        success: function(response){ // 성공했을 때 호출할 콜백을 지정한다.
+          id = $(this).attr('name')
+          $('#count'+ pk).html("count : "+ response.recommend_count);
+          alert(response.message);
+          alert("추천수 :" + response.recommend.count);
+        },
+        error:function(request,status,error){
+          alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+        }
+    });
+  })
     </script>
   </head>
 
@@ -84,16 +108,13 @@
                 <br>
                 {{ news.n_content }}
                 <br>
-                <br>            
+                <br>   
+                  <!-- 조회수 -->
                   <h5>🖱조회수:{{view.view_count}}   
                     <br>
                     <!-- 추천 -->
-                    <div class="col-2">
-                      <div class="bg-light text-center p-3 border font-weight-bolder mb-1">
-                      <span class="material-icons-outlined">thumb_up</span>
-                      <a href="{% url 'news_post' news.n_id %}">추천</a>
-                      <em class="">{{news.view_count}}</em>
-                    </div>
+                    <input type="button" class="추천" name="{{ r_count.id }}" value="추천">
+                    <p id="count{{ r_count.n_id }}">추천: {{ r_count.total_recommend}}</p>
                   </div>
             </div>
           </div>

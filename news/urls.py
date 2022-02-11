@@ -14,4 +14,5 @@ urlpatterns = [
     path("world/", views.world, name="world"),
     path("travel/", views.travel, name="travel"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
+    path('recommend/', views.recommend, name='recommend'),
 ]

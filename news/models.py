@@ -7,6 +7,8 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.auth.models import User
+from django.conf import settings
 
 class N_Category(models.Model):
     c_id = models.AutoField(primary_key=True)
@@ -63,6 +65,11 @@ class N_content(models.Model):
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
     view_count = models.PositiveIntegerField(default=0)
+    recommend = models.PositiveIntegerField(default=0)
+
+    @property
+    def total_recommend(self):
+        return self.recommend.count() #추천 갯수
 
     class Meta:
         managed = False
@@ -71,7 +78,8 @@ class N_content(models.Model):
 # 조회수 테이블
 class ViewCount(models.Model):
     ip = models.CharField(max_length=30)
-    view_count = models.ForeignKey(N_content, on_delete=models.CASCADE)
+    view_count = models.ForeignKey(N_content, on_delete=models.CASCADE) 
+    # recommend_count = models.ForeignKey(N_content, on_delete=models.CASCADE)
 
     def __unicode__(self):
         return self.ip

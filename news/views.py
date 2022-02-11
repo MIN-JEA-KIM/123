@@ -1,10 +1,17 @@
-
+#추천
+try:
+    from django.utils import simplejson as json
+except ImportError:
+    import json
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+#######################################################
+from django.http import HttpResponse 
 from email.policy import default
 from itertools import product
 from multiprocessing import context
 from re import template
-from urllib import response
-from django.http import JsonResponse
+from urllib import request, response
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
@@ -19,23 +26,6 @@ import logging
 logger = logging.getLogger('news')
 
 # -2022.02.07 park_jong_won add {def scrollLog, import datetime} del {def log}
-# class PostView(View):
-#     def get(self,request,view_count):
-#         if not N_content.objects.filter(id = view_count).exists():
-#             return JsonResponse({'MESSAGE' : 'DOES_NOT_EXIST_POST'}, status = 404)
-
-#         view = N_content.objects.get(id = view_count)
-
-#         IPaddr = get_client_ip(request)
-
-#         if not Log.objects.filter(access_ip= IPaddr).exists():
-#             view.counting += 1 
-#             view.save()
-            
-#             Log.objects.create(access_ip = IPaddr)
-
-#         return JsonResponse({"view" : view}, status = 200)
-
 def scrollLog(req):
     if req.method == 'POST':
         # form = req.POST      
@@ -309,6 +299,24 @@ def news_post(req, n_id):
     #return render(req, "news_post.html", {'news': news, 'view': view})
     return render(req, 'news_post.html', context)
 
+@require_POST
+def recommend(req):
+    if req.method == 'POST':
+        ip = request.ip # ip를 가져온다.
+        n_id = request.POST.get('pk', None)
+        r_count = N_content.objects.get(pk = n_id)
+
+        if r_count.recommend.filter(id = ip.id).exists(): #이미 해당 유저가 likes컬럼에 존재하면
+            r_count.recommend.remove(ip) #likes 컬럼에서 해당 유저를 지운다.
+            message = 'ip o'
+        else:
+            r_count.recommend.add(ip)
+            message = 'recommned'
+
+    context = {'recommend.count' : r_count.total_recommend, 'message' : message}
+    return HttpResponse(json.dumps(context), content_type='application/json')
+    # dic 형식을 json 형식으로 바꾸어 전달한다.
+     
 def index(req):
 
     scrollLog(req)
