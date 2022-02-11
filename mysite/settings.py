@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'mathfilters',
     'login',
+    'login.apps.LoginConfig',
+
 ]
 
 MIDDLEWARE = [

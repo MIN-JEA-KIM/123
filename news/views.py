@@ -1,15 +1,40 @@
+
+from email.policy import default
+from itertools import product
+from multiprocessing import context
+from re import template
+from urllib import response
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views import View
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.contrib.auth.hashers import make_password, check_password
 from .models import *
+from datetime import datetime
+import logging
 
 # -2022.01.24 park_jong_won
-import logging
 logger = logging.getLogger('news')
 
 # -2022.02.07 park_jong_won add {def scrollLog, import datetime} del {def log}
-from datetime import datetime
+# class PostView(View):
+#     def get(self,request,view_count):
+#         if not N_content.objects.filter(id = view_count).exists():
+#             return JsonResponse({'MESSAGE' : 'DOES_NOT_EXIST_POST'}, status = 404)
 
+#         view = N_content.objects.get(id = view_count)
+
+#         IPaddr = get_client_ip(request)
+
+#         if not Log.objects.filter(access_ip= IPaddr).exists():
+#             view.counting += 1 
+#             view.save()
+            
+#             Log.objects.create(access_ip = IPaddr)
+
+#         return JsonResponse({"view" : view}, status = 200)
 
 def scrollLog(req):
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -33,27 +58,7 @@ def scrollLog(req):
     print(f"HTTP_X_FORWARDED_FOR = {req.META.get('HTTP_X_FORWARDED_FOR')}, REMOTE_ADDR = {req.META.get('REMOTE_ADDR')}, HTTP_X_REAL_IP = {req.META.get('HTTP_X_REAL_IP')}")
 
 
-# Create your views here.
-# def index(req):
-
-#     scrollLog(req)
-#     if req.method == 'POST':
-#         # form = TestForm(req.POST)
-#         form = req.POST
-#         logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-#     else:
-#         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")
-
-#     query = "select * from News n inner join N_summarization_one nso on n.n_id = nso.n_id"
-#     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
-#     # news_list 페이징 처리
-#     page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
-#     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
-#     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
-
-#     # return render(req, "index.html", {'banner': ns})
-#     return render(req, "index.html", {'page_obj': page_obj, 'news_list': news_list})
-
+    return context
 
 def author(req):
 
@@ -307,6 +312,13 @@ def travel(req):
 
     return render(req, "travel.html", context=context)
 
+def get_client_ip(request): #Ip 가져오기
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[-1].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 def news_post(req, n_id):
 
@@ -325,52 +337,38 @@ def news_post(req, n_id):
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
+    view = get_object_or_404(N_content, pk=n_id)
+    lp = req.session.get('lp')
+
+    # 조회수
+    ip = get_client_ip(req)
+    cnt = ViewCount.objects.filter(ip=ip, view_count=view).count()
+    if cnt == 0:
+        qc = ViewCount(ip=ip, view_count=view)
+        qc.save()
+        if view.view_count:
+            view.view_count += 1
+        else:
+            view.view_count = 1
+        view.save()
+
+  
     query = f"""
-        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
+        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content, view_count
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
         inner join N_summarization ns on n.n_id = ns.n_id
         where n.n_id ={n_id} 
     """
-    # query = f"""
-    #     select *
-    #     from News n 
-    #     inner join N_content nc on n.n_id = nc.n_id 
-    #     inner join N_summarization_one nso on n.n_id = nso.n_id
-    #     where n.n_id = {n_id} 
-    # """
-    news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
-    
-    # return render(req, "index.html", {'banner': ns})
+    news = News.objects.raw(query)[0]
 
-    return render(req, "news_post.html", {'news': news})
+    context = {
+        'news': news,
+        'view': view
+    }
 
-
-# def banner1(req):
-#     raw = f"select nc_id, n_content from N_content where nc_id = 1"
-#     NC = N_content.objects.raw(raw)
-#     ns = NC[0].n_content
-#     return render(req, 'banner1.html', {'banner1': ns})
-#
-#
-# def banner2(req):
-#     raw = f"select nc_id, n_content from N_content where nc_id = 1"
-#     NC = N_content.objects.raw(raw)
-#     ns = NC[1].n_content
-#     return render(req, 'banner1.html', {'banner2': ns})
-#
-#
-# def banner3(req):
-#     raw = f"select nc_id, n_content from N_content where nc_id = 1"
-#     NC = N_content.objects.raw(raw)
-#     ns = NC[2].n_content
-#     return render(req, 'banner1.html', {'banner3': ns})
-
-# def banner(req):
-#     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' order by n_input desc limit 4"
-#     NC = N_content.objects.raw(raw)
-#     return render(req, 'index.html', {'banners': NC})
-
+    #return render(req, "news_post.html", {'news': news, 'view': view})
+    return render(req, 'news_post.html', context)
 
 def index(req):
 
@@ -430,7 +428,16 @@ def index(req):
     paginator105 = Paginator(news_list105, '10')
     page_obj105 = paginator105.page(page105)
 
-    return render(req, "index.html", {'banners': NC, 'page_obj100':page_obj100, 'news_list100':news_list100, 'page_obj101':page_obj101, 'news_list101':news_list101, 'page_obj102':page_obj102, 'news_list102':news_list102, 'page_obj103':page_obj103, 'news_list103':news_list103, 'page_obj104':page_obj104, 'news_list104':news_list104, 'page_obj105':page_obj105, 'news_list105':news_list105})
+    context = {
+        'banners': NC, 
+        'page_obj100':page_obj100, 'news_list100':news_list100, 
+        'page_obj101':page_obj101, 'news_list101':news_list101, 
+        'page_obj102':page_obj102, 'news_list102':news_list102, 
+        'page_obj103':page_obj103, 'news_list103':news_list103, 
+        'page_obj104':page_obj104, 'news_list104':news_list104, 
+        'page_obj105':page_obj105, 'news_list105':news_list105
+    }
+    return render(req, "index.html", context)
 
 
 def want_category(c_id):
@@ -443,12 +450,3 @@ def want_category(c_id):
         where c_id = {c_id} and n_input != '9999-12-31 00:00:00'
         order by n_input desc"""
     return query
-            
-            
-# def log(req):
-#     if req.method == 'POST':
-#         # form = TestForm(req.POST)
-#         form = req.POST
-#         logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-#     else:
-#         logger.info(f"GET log [IPaddr = {req.META.get('REMOTE_ADDR')}]")

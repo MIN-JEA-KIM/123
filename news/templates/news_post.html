@@ -26,6 +26,12 @@
     <!-- inject:css -->
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <!-- endinject -->
+
+     <!-- Google icon -->
+     <link
+     href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+     rel="stylesheet">
+
     <script type="text/javascript">
       function showClock(){
         var currentDate = new Date();
@@ -77,6 +83,18 @@
                 <br>  
                 <br>
                 {{ news.n_content }}
+                <br>
+                <br>            
+                  <h5>🖱조회수:{{view.view_count}}   
+                    <br>
+                    <!-- 추천 -->
+                    <div class="col-2">
+                      <div class="bg-light text-center p-3 border font-weight-bolder mb-1">
+                      <span class="material-icons-outlined">thumb_up</span>
+                      <a href="{% url 'news_post' news.n_id %}">추천</a>
+                      <em class="">{{news.view_count}}</em>
+                    </div>
+                  </div>
             </div>
           </div>
         </div>
@@ -102,3 +120,4 @@
     <!-- End custom js for this page-->
   </body>
 </html>
+
