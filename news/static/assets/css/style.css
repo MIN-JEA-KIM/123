@@ -4045,7 +4045,7 @@ input[type="button"].btn-block {
 
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
-  color: #000000;
+  color: #f2a654;
   background-color: #ffffff;
   border-color: #ebedf2 #ebedf2 #ffffff;
 }
@@ -4062,7 +4062,7 @@ input[type="button"].btn-block {
 
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
-  color: #000000;
+  color: #f2a654;
   background-color: #007bff;
 }
 
@@ -10483,7 +10483,7 @@ h6, .h6 {
   padding: 14px 16px 14px 25px !important;
   margin: 10px 0;
   border-radius: 96px 0 0px 96px;
-  color: #000000;
+  color: #ffffff;
 }
 
 #main-banner-carousel .owl-dots .owl-dot.active {

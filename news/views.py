@@ -19,12 +19,17 @@ def scrollLog(req):
     else:
         ip = req.META.get('REMOTE_ADDR')
 
+
     if req.method == 'POST':
-        # form = req.POST
-        # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-        new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
-        new_scroll_data.save()
-        print("save scroll_data")
+        if 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+            # form = req.POST
+            # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+            new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
+            new_scroll_data.save()
+            print("save scroll_data")
+        else:
+            pass
     else:
         # logger.info("GET log")
         new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
@@ -317,13 +322,39 @@ def index(req):
     else:
         ip = req.META.get('REMOTE_ADDR')
 
+    # if req.method == 'POST':
+    #     # form = TestForm(req.POST)
+    #     logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+    # else:
+    #     logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")  # get
+    
+    
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-    else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        if 'id' in req.POST.keys() :
+	    
+            query = f"select id, password from memberinfo where id = '{req.POST['id']}'"
+            user = Memberinfo.objects.raw(query)
+            
+            try:
+                f_password = user[0].password
 
+            # if req.POST['id'] == f_id and req.POST['password'] == f_password:
+            #     return render(req, 'index.html', {'user' : "환영합니다."})
+
+                if req.POST['password'] == f_password:
+                    return render(req, 'index.html', {'user' : "환영합니다."})
+                else:
+                    return render(req, 'index.html', {'error_massage' : "비밀번호를 잘못 입력하셨습니다."})
+
+            except:
+                return render(req, 'index.html', {'error_massage' : "없는 ID 입니다."})
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+
+    else : # GET
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
 
@@ -379,6 +410,7 @@ def want_category(c_id):
         order by n_input desc"""
     return query
 
+
 def memberinfo(req):
     # memberinfo 으로 POST 요청이 왔을 때, 새로운 유저를 만드는 절차를 밟는다.
     if req.method == 'POST':
@@ -411,6 +443,26 @@ def memberinfo(req):
         else:   
             
             return render(req, 'memberinfo.html', {'error' : "비밀번호 다름"})
-    
     else:
         return render(req, 'memberinfo.html')
+
+
+# def login(req):
+
+#     if req.method == 'POST':
+#         try:
+
+#             query = f"select id, password from memberinfo where id = '{req.POST['id']}' and password = '{req.POST['password']}'"
+#             user = Memberinfo.objects.raw(query)
+#             f_id = user[0].id
+#             f_password = user[0].password
+
+#             if req.POST['id'] == f_id and req.POST['password'] == f_password:
+#                 return render(req, 'index.html', {'user' : "환영합니다."})
+
+#             else:
+#                 return render(req, 'index.html', {'error' : "아이디 또는 비밀번호를 잘못 입력하셨습니다."})
+#         except:
+#             return render(req, 'index.html')
+#     else:
+#         return render(req, 'index.html')
