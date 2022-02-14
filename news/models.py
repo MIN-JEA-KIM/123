@@ -9,6 +9,9 @@ from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation
 
 class N_Category(models.Model):
     c_id = models.AutoField(primary_key=True)
@@ -64,7 +67,7 @@ class N_content(models.Model):
     nc_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
-    view_count = models.PositiveIntegerField(default=0)
+    hits = models.PositiveIntegerField(default=0, verbose_name='조회수')
     recommend = models.PositiveIntegerField(default=0)
 
     @property
@@ -76,15 +79,8 @@ class N_content(models.Model):
         db_table = 'N_content'
 
 # 조회수 테이블
-class ViewCount(models.Model):
-    ip = models.CharField(max_length=30)
-    view_count = models.ForeignKey(N_content, on_delete=models.CASCADE) 
-    # recommend_count = models.ForeignKey(N_content, on_delete=models.CASCADE)
 
-    def __unicode__(self):
-        return self.ip
-
-# 2022-02-07 park-jong-won  add ScrollData,Log
+#2022-02-07 park-jong-won  add ScrollData,Log
 class ScrollData(models.Model):
     ipaddr = models.CharField(max_length=15)
     acstime = models.DateTimeField(auto_now = True)
@@ -104,3 +100,17 @@ class Log(models.Model):
     class Meta:
         managed = False
         db_table = 'Log'
+
+
+class Memberinfo(models.Model):
+    id = models.CharField(primary_key=True, max_length=20)
+    password = models.CharField(max_length=30, blank=True, null=True)
+    name = models.CharField(max_length=10, blank=True, null=True)
+    birth = models.DateField(blank=True, null=True)
+    sex = models.CharField(max_length=5, blank=True, null=True)
+    email = models.CharField(max_length=50, blank=True, null=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'memberinfo'

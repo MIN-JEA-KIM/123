@@ -109,21 +109,19 @@
                 {{ news.n_content }}
                 <br>
                 <br>   
-                  <!-- 조회수 -->
-                  <h5>🖱조회수:{{view.view_count}}   
-                    <br>
-                    <!-- 추천 -->
-                    <input type="button" class="추천" name="{{ r_count.id }}" value="추천">
-                    <p id="count{{ r_count.n_id }}">추천: {{ r_count.total_recommend}}</p>
-                  </div>
+                <!-- 조회수 -->
+                조회수: {{article.hits}}
+                <br>
+                <!-- 추천 -->
+                <input type="button" class="추천" name="{{ r_count.id }}" value="추천">
+                <p id="count{{ r_count.n_id }}">추천: {{ r_count.total_recommend}}</p>
             </div>
           </div>
         </div>
-        <div class="row">
-          
-        </div>
+        <div>
       </div>
     </div>
+  </div>
     <!-- container-scroller ends -->
     <!-- partial:../partials/_footer.html -->
     {% include '_footer.html' %}
@@ -142,3 +140,50 @@
   </body>
 </html>
 
+<!-- <div class="btn_util share_btn"> 
+                      <button id="rSocialShareButton" class="btn_set btn_share" aria-expanded="false">
+                        <span class="ico_newsview">공유</span>
+                      </button>
+                      <div id="rSocialShareLayerContainer">
+                        <div class="social_comm_p_hide">
+                          <div class="sns_comm_p share_layer">
+                            <strong class="screen_out">SNS로 공유하기 펼쳐짐</strong>
+                            <ul class="list_sns">
+                                <a href="https://twitter.com/?lang=ko" class="link_sns" data-handler="twitter">
+                                  <span>"트위터"</span>
+                                </a>
+                              </li>
+                              <li>
+                                <a href="www.facebook.com" class="link_sns" data-handler="facebook">
+                                  <span>"페이스북"</span>
+                                </a>
+                              </li>
+                            </ul>
+                            <div calss="copyUrl">
+                              <div class="sns_copyurl">
+                                <a href="#" class="link_copyurl">
+                                  <span class="screen_out">현재 페이지 URL복사</span>
+                                  <span class="txt_url">{news.olink}</span>
+                                  <span class="txt_copy">URL복사</span>
+                                </a>
+                              </div>
+                            </div>
+                            <button class="btn_close">
+                              <span class="img_social ico_close">공유목록 닫기</span>
+                            </button>
+                          </div>
+                          <div class="sns_comm_p share_layer">
+                            <div class="inner_copyurl">
+                              <p class="desc_copy_url">
+                                "주소가 복사되었습니다"
+                                <br>
+                                "원하는 곳에 붙여넣기 하세요"
+                              </p>
+                              <button class="btn_close">
+                                <span class="img_social ico_close">공유목록 닫기</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div> 
+                    </div>   -->

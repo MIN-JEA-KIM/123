@@ -6,6 +6,7 @@ except ImportError:
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 #######################################################
+from datetime import date, datetime, timedelta
 from django.http import HttpResponse 
 from email.policy import default
 from itertools import product
@@ -289,13 +290,14 @@ def travel(req):
 
     return render(req, "travel.html", context=context)
 
-def get_client_ip(request): #Ip 가져오기
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[-1].strip()
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+# #Ip 가져오기
+# def get_client_ip(request):
+#     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+#     if x_forwarded_for:
+#         ip = x_forwarded_for.split(',')[-1].strip()
+#     else:
+#         ip = request.META.get('REMOTE_ADDR')
+#     return ip
 
 def news_post(req, n_id):
 
@@ -314,24 +316,10 @@ def news_post(req, n_id):
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
-    view = get_object_or_404(N_content, pk=n_id)
-    lp = req.session.get('lp')
+    article = get_object_or_404(N_content, pk=n_id) 
 
-    # 조회수
-    ip = get_client_ip(req)
-    cnt = ViewCount.objects.filter(ip=ip, view_count=view).count()
-    if cnt == 0:
-        qc = ViewCount(ip=ip, view_count=view)
-        qc.save()
-        if view.view_count:
-            view.view_count += 1
-        else:
-            view.view_count = 1
-        view.save()
-
-  
     query = f"""
-        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content, view_count
+        select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
         inner join N_summarization ns on n.n_id = ns.n_id
@@ -341,11 +329,28 @@ def news_post(req, n_id):
 
     context = {
         'news': news,
-        'view': view
+        'article': article
     }
 
+    response = render(req, 'news_post.html', context)
+
+    expire_date, now = datetime.now(), datetime.now()
+    expire_date += timedelta(days=1)
+    expire_date = expire_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    expire_date -= now
+    max_age = expire_date.total_seconds()
+
+    cookie_value = req.COOKIES.get('news_post', '_')
+
+    if f'_{n_id}_' not in cookie_value:
+        cookie_value += f'{n_id}_'
+        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
+        article.hits += 1
+        article.save()
+
+    return response
     #return render(req, "news_post.html", {'news': news, 'view': view})
-    return render(req, 'news_post.html', context)
+    
 
 @require_POST
 def recommend(req):
