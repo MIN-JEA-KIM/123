@@ -23,15 +23,14 @@ def scrollLog(req):
     if req.method == 'POST':
         if 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-            # form = req.POST
-            # logger.info(f"POST log [IPaddr = {req.META.get('REMOTE_ADDR')}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+
             new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
             new_scroll_data.save()
             print("save scroll_data")
         else:
             pass
     else:
-        # logger.info("GET log")
+
         new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
         new_log.save()
         print("save log_data")
@@ -40,7 +39,7 @@ def scrollLog(req):
 
 
 def author(req):
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -50,13 +49,15 @@ def author(req):
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
-    # post_latest = Post.objects.order_by("-createDate")[:6]
     context = {
         # "post_latest": post_latest
     }
@@ -65,7 +66,7 @@ def author(req):
 
 
 def politics(req): # 정치
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -75,9 +76,12 @@ def politics(req): # 정치
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
@@ -94,13 +98,14 @@ def politics(req): # 정치
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-    return render(req, "politics.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "politics.html", data)
 
 
 def economy(req): # 경제
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -110,9 +115,12 @@ def economy(req): # 경제
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
@@ -129,13 +137,14 @@ def economy(req): # 경제
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-    return render(req, "economy.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "economy.html", data)
 
 
 def society(req): # 사회
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -145,9 +154,12 @@ def society(req): # 사회
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
@@ -164,13 +176,14 @@ def society(req): # 사회
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-    return render(req, "society.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "society.html", data)
 
 
 def life(req): # 생활문화
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -180,9 +193,12 @@ def life(req): # 생활문화
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
@@ -199,13 +215,14 @@ def life(req): # 생활문화
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-    return render(req, "life.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "life.html", data)
 
 
 def IT(req): # IT/과학
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -215,9 +232,12 @@ def IT(req): # IT/과학
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
@@ -234,13 +254,14 @@ def IT(req): # IT/과학
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-    return render(req, "IT.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "IT.html", data)
 
 
 def world(req): # 세계
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -250,9 +271,12 @@ def world(req): # 세계
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
@@ -269,13 +293,15 @@ def world(req): # 세계
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    # return render(req, "index.html", {'banner': ns})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-    return render(req, "world.html", {'page_obj': page_obj, 'news_list': news_list})
+    return render(req, "world.html", data)
 
 
 def news_post(req, n_id):
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -285,9 +311,12 @@ def news_post(req, n_id):
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
@@ -300,8 +329,8 @@ def news_post(req, n_id):
     """
     
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
-
-    return render(req, "news_post.html", {'news': news})
+    data['news'] = news
+    return render(req, "news_post.html", data)
 
 
 def index(req):
@@ -317,19 +346,8 @@ def index(req):
     
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            query = f"select id, password from memberinfo where id = '{req.POST['id']}'"
-            user = Memberinfo.objects.raw(query)
-            
-            try:
-                f_password = user[0].password
 
-                if req.POST['password'] == f_password:
-                    data['login_massage'] = "환영합니다."
-                else:
-                    data['login_massage'] = "비밀번호를 잘못 입력하셨습니다."
-            except:
-                 data['login_massage'] = "없는 ID 입니다."
+            data['login_massage'] = login(req)
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -404,3 +422,24 @@ def memberinfo(req):
             return render(req, 'memberinfo.html', {'error' : "비밀번호 다름"})
     else:
         return render(req, 'memberinfo.html')
+
+
+def login(req): # 로그인
+    if req.method == 'POST':
+        u_id = req.POST['id']
+        u_password = req.POST['password']
+
+        query = f"select id, password from memberinfo where id = '{u_id}'"
+        user = Memberinfo.objects.raw(query)
+            
+        try:
+            f_password = user[0].password
+
+            if u_password == f_password:
+                return "환영합니다."
+            else:
+                return "비밀번호를 잘못 입력하셨습니다."
+        except:
+                return "없는 ID 입니다."
+
+        
