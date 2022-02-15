@@ -316,8 +316,6 @@ def news_post(req, n_id):
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
 
-    article = get_object_or_404(N_content, pk=n_id) 
-
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
         from News n 
@@ -327,6 +325,8 @@ def news_post(req, n_id):
     """
     news = News.objects.raw(query)[0]
 
+    article = get_object_or_404(N_content, pk=n_id) 
+    
     context = {
         'news': news,
         'article': article
