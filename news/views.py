@@ -298,21 +298,14 @@ def news_post(req, n_id):
         inner join N_summarization ns on n.n_id = ns.n_id
         where n.n_id ={n_id} 
     """
-    # query = f"""
-    #     select *
-    #     from News n 
-    #     inner join N_content nc on n.n_id = nc.n_id 
-    #     inner join N_summarization_one nso on n.n_id = nso.n_id
-    #     where n.n_id = {n_id} 
-    # """
-    news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     
-    # return render(req, "index.html", {'banner': ns})
+    news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
 
     return render(req, "news_post.html", {'news': news})
 
 
 def index(req):
+    data = {}
 
     scrollLog(req)
 
@@ -321,13 +314,6 @@ def index(req):
         ip = x_forwarded_for.split(',')[0]
     else:
         ip = req.META.get('REMOTE_ADDR')
-
-    # if req.method == 'POST':
-    #     # form = TestForm(req.POST)
-    #     logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    # else:
-    #     logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")  # get
-    
     
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
@@ -338,16 +324,12 @@ def index(req):
             try:
                 f_password = user[0].password
 
-            # if req.POST['id'] == f_id and req.POST['password'] == f_password:
-            #     return render(req, 'index.html', {'user' : "환영합니다."})
-
                 if req.POST['password'] == f_password:
-                    return render(req, 'index.html', {'user' : "환영합니다."})
+                    data['login_massage'] = "환영합니다."
                 else:
-                    return render(req, 'index.html', {'error_massage' : "비밀번호를 잘못 입력하셨습니다."})
-
+                    data['login_massage'] = "비밀번호를 잘못 입력하셨습니다."
             except:
-                return render(req, 'index.html', {'error_massage' : "없는 ID 입니다."})
+                 data['login_massage'] = "없는 ID 입니다."
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -358,45 +340,22 @@ def index(req):
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
 
-    query100 = want_category(100)
-    news_list100 = News.objects.raw(query100) #models.py Board 클래스의 모든 객체를 board_list에 담음
-    query101 = want_category(101)
-    news_list101 = News.objects.raw(query101)
-    query102 = want_category(102)
-    news_list102 = News.objects.raw(query102)
-    query103 = want_category(103)
-    news_list103 = News.objects.raw(query103)
-    query104 = want_category(104)
-    news_list104 = News.objects.raw(query104)
-    query105 = want_category(105)
-    news_list105 = News.objects.raw(query105)
+    query = []
+    news_list = []
+    j = 0
+    for i in range(100, 106):
+        query.append(want_category(i))
+        raw_db = News.objects.raw(query[j])
+        news_list.append(raw_db)
+        exec(f"data['news_list{i}'] = raw_db")
+        exec(f"page{i} = req.GET.get('page', '1')")
+        exec(f"paginator{i} = Paginator(news_list[{j}], '10')")
+        exec(f"page_obj{i} = paginator{i}.page(page{i})")
+        exec(f"data['page_obj{i}'] = page_obj{i}")
+        j += 1
 
-    # news_list100 페이징 처리
-    page100 = req.GET.get('page', '1') #GET 방식으로 정보를 받아오는 데이터
-    paginator100 = Paginator(news_list100, '10') #Paginator(분할될 객체, 페이지 당 담길 객체수)
-    page_obj100 = paginator100.page(page100) #페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
-
-    page101 = req.GET.get('page', '1')
-    paginator101 = Paginator(news_list101, '10')
-    page_obj101 = paginator101.page(page101)
-
-    page102 = req.GET.get('page', '1')
-    paginator102 = Paginator(news_list102, '10')
-    page_obj102 = paginator102.page(page102)
-
-    page103 = req.GET.get('page', '1')
-    paginator103 = Paginator(news_list103, '10')
-    page_obj103 = paginator103.page(page103)
-
-    page104 = req.GET.get('page', '1')
-    paginator104 = Paginator(news_list104, '10')
-    page_obj104 = paginator104.page(page104)
-
-    page105 = req.GET.get('page', '1')
-    paginator105 = Paginator(news_list105, '10')
-    page_obj105 = paginator105.page(page105)
-
-    return render(req, "index.html", {'banners': NC, 'page_obj100':page_obj100, 'news_list100':news_list100, 'page_obj101':page_obj101, 'news_list101':news_list101, 'page_obj102':page_obj102, 'news_list102':news_list102, 'page_obj103':page_obj103, 'news_list103':news_list103, 'page_obj104':page_obj104, 'news_list104':news_list104, 'page_obj105':page_obj105, 'news_list105':news_list105})
+    data['banners'] = NC
+    return render(req, "index.html", data)
 
 
 def want_category(c_id):
@@ -445,24 +404,3 @@ def memberinfo(req):
             return render(req, 'memberinfo.html', {'error' : "비밀번호 다름"})
     else:
         return render(req, 'memberinfo.html')
-
-
-# def login(req):
-
-#     if req.method == 'POST':
-#         try:
-
-#             query = f"select id, password from memberinfo where id = '{req.POST['id']}' and password = '{req.POST['password']}'"
-#             user = Memberinfo.objects.raw(query)
-#             f_id = user[0].id
-#             f_password = user[0].password
-
-#             if req.POST['id'] == f_id and req.POST['password'] == f_password:
-#                 return render(req, 'index.html', {'user' : "환영합니다."})
-
-#             else:
-#                 return render(req, 'index.html', {'error' : "아이디 또는 비밀번호를 잘못 입력하셨습니다."})
-#         except:
-#             return render(req, 'index.html')
-#     else:
-#         return render(req, 'index.html')
