@@ -336,9 +336,9 @@ def news_post(req, n_id):
 
     expire_date, now = datetime.now(), datetime.now()
     expire_date += timedelta(days=1)
-    expire_date = expire_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    #expire_date = expire_date.replace(hour=23, minute=0, second=0, microsecond=0)
     expire_date -= now
-    max_age = expire_date.total_seconds()
+    max_age = 60*60*24*30 
 
     cookie_value = req.COOKIES.get('news_post', '_')
 

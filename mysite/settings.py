@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+from email.policy import default
 import os
 from pathlib import Path
 import pymysql	
@@ -157,3 +158,10 @@ LOGGING = {
         },
     },
 }
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+DAY_IN_SECONDS = 86400 
+SESSION_COOKIE_AGE = DAY_IN_SECONDS * 2
+SESSION_SAVE_EVERY_REQUEST = True
+
+ 
