@@ -4,6 +4,8 @@ from django.urls import path
 from . import views
 from .views import *
 
+
+
 urlpatterns = [
     path('', views.index, name="index"),
     path("author/", views.author, name="author"),
@@ -16,6 +18,6 @@ urlpatterns = [
     path("memberinfo/", views.memberinfo, name="memberinfo"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
     path("memberinfo/", views.memberinfo, name="memberinfo"),
-    # path('recommend/', views.recommend, name='recommend'),
+    path('recommend/', views.recommend, name='recommend'),
 ]
 

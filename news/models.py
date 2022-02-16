@@ -6,7 +6,8 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.conf import settings
 
 class N_Category(models.Model):
     c_id = models.AutoField(primary_key=True)
@@ -46,7 +47,10 @@ class N_content(models.Model):
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
     hits = models.PositiveIntegerField(blank=True, default=0, verbose_name='조회수')
-    recommend = models.PositiveIntegerField(default=0)
+    recommend = models.PositiveIntegerField(settings.AUTH_USER_MODEL, blank=True)
+
+    def count_recommend(self): # total recommend
+        return self.recommend.count()
 
     class Meta:
         managed = False
@@ -93,7 +97,6 @@ class Log(models.Model):
         db_table = 'Log'
 
 class Memberinfo(models.Model):
-
     id = models.CharField(primary_key=True, max_length=20)
     password = models.CharField(max_length=30)
     name = models.CharField(max_length=10)
