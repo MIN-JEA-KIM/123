@@ -77,6 +77,13 @@
                 <br>  
                 <br>
                 {{ news.n_content }}
+                <br>
+                <br>   
+                <!-- 조회수 -->
+                {% csrf_token %}
+                조회수: {{article.hits}}
+                <br>
+                <!-- 추천 -->
             </div>
           </div>
         </div>

@@ -1,16 +1,25 @@
 from django.shortcuts import render, redirect
+from datetime import date, datetime, timedelta
+from django.http import HttpResponse 
+from email.policy import default
+from itertools import product
+from multiprocessing import context
+from re import template
+from urllib import request, response
+from django.shortcuts import redirect, render, get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views import View
+from django.shortcuts import render
 from django.core.paginator import Paginator
 from .models import *
 from django.contrib import auth
+import logging
+from datetime import datetime
 
 # -2022.01.24 park_jong_won
-import logging
 logger = logging.getLogger('news')
 
 # -2022.02.07 park_jong_won add {def scrollLog, import datetime} del {def log}
-from datetime import datetime
-
-
 def scrollLog(req):
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -298,6 +307,14 @@ def world(req): # 세계
 
     return render(req, "world.html", data)
 
+# #Ip 가져오기
+# def get_client_ip(request):
+#     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+#     if x_forwarded_for:
+#         ip = x_forwarded_for.split(',')[0]
+#     else:
+#         ip = request.META.get('REMOTE_ADDR')
+#     return ip
 
 def news_post(req, n_id):
 
@@ -327,12 +344,30 @@ def news_post(req, n_id):
         inner join N_summarization ns on n.n_id = ns.n_id
         where n.n_id ={n_id} 
     """
-    
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     data['news'] = news
-    return render(req, "news_post.html", data)
+    
+    article = get_object_or_404(N_content, pk=n_id)
+    data['article'] = article
 
+    response = render(req, "news_post.html", data)
 
+    expire_date, now = datetime.now(), datetime.now()
+    expire_date += timedelta(days=1)
+    #expire_date = expire_date.replace(hour=23, minute=0, second=0, microsecond=0)
+    expire_date -= now
+    max_age = 60*60*24*30 
+
+    cookie_value = req.COOKIES.get('news_post', '_')
+
+    if f'_{n_id}_' not in cookie_value:
+        cookie_value += f'{n_id}_'
+        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
+        article.hits += 1
+        article.save()
+
+    return response
+  
 def index(req):
     data = {}
 
@@ -376,6 +411,7 @@ def index(req):
     return render(req, "index.html", data)
 
 
+
 def want_category(c_id):
     
     query = f"""
@@ -386,6 +422,8 @@ def want_category(c_id):
         where c_id = {c_id} and n_input != '9999-12-31 00:00:00'
         order by n_input desc"""
     return query
+
+
 
 
 def memberinfo(req):
@@ -421,6 +459,7 @@ def memberinfo(req):
             
             return render(req, 'memberinfo.html', {'error' : "비밀번호 다름"})
     else:
+
         return render(req, 'memberinfo.html')
 
 
@@ -441,5 +480,3 @@ def login(req): # 로그인
                 return "비밀번호를 잘못 입력하셨습니다."
         except:
                 return "없는 ID 입니다."
-
-        
