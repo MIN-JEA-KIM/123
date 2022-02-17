@@ -371,17 +371,6 @@ def news_post(req, n_id):
     return response
 
 def recommend(request):
-    # pk = request.POST.get('pk', None)
-    # video = get_object_or_404(Video, pk=pk)
-    # user = request.user
-
-    # if video.likes_user.filter(id=user.id).exists():
-    #     video.likes_user.remove(user)
-    #     message = '좋아요 취소'
-    # else:
-    #     video.likes_user.add(user)
-    #     message = '좋아요'
-
     pk = request.POST.get('pk', None)
     n_rec = get_object_or_404(N_content, pk=pk)
     user = request.user
@@ -393,7 +382,6 @@ def recommend(request):
         n_rec.recommend.add(user)
         message = '좋아요'
 
-    # context = {'likes_count':video.count_likes_user(), 'message': message}
     context = {'recommend_count':n_rec.count_recommend_user(), 'message': message}
     return HttpResponse(json.dumps(context), content_type="application/json")
 
