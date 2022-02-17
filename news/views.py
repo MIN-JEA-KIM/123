@@ -352,15 +352,27 @@ def news_post(req, n_id, pk):
     data['news'] = news
 
     # news summarization, news content 줄 바꿈 처리
-    print(news.ns_content)
-    print("============")
-    print(news.n_content)
+    ns_c = news.ns_content
+    sum_list=[]
 
-    
+    while(ns_c.find('\n') != -1):
+        print(ns_c)
+        sum_list.append(ns_c[:ns_c.find('\n')])
+        ns_c = ns_c[ns_c.find('\n')+1:]
+
+    data['ns_content'] = sum_list
+
+
     login_session = req.session.get('login_session')
     
+<<<<<<< HEAD
     article = get_object_or_404(N_content, id=pk)
     data['article'] = article
+=======
+    # 조회수
+    # article = get_object_or_404(N_content, pk=n_id)
+    # data['article'] = article
+>>>>>>> 886363afdf2aa5617977d3ebea5490675e48b128
 
     # if req.session.get('login_session') is None:
     #     cookie_name = 'news_post'
