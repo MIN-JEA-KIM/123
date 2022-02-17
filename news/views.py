@@ -348,6 +348,12 @@ def news_post(req, n_id):
     """
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     data['news'] = news
+
+    # news summarization, news content 줄 바꿈 처리
+    print(news.ns_content)
+    print("============")
+    print(news.n_content)
+
     
     login_session = req.session.get('login_session')
     
