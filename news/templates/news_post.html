@@ -26,12 +26,15 @@
     <!-- inject:css -->
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <!-- endinject -->
+<<<<<<< Updated upstream
 
      <!-- Google icon -->
      <link
      href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
      rel="stylesheet">
 
+=======
+>>>>>>> Stashed changes
     <script type="text/javascript">
       function showClock(){
         var currentDate = new Date();
@@ -110,13 +113,15 @@
                 <br>
                 <br>   
                 <!-- 조회수 -->
-                {% csrf_token %}
                 조회수: {{article.hits}}
+<<<<<<< Updated upstream
                 <br>
                 <!-- 추천 -->
                 <input type="button" class="추천" name="{{ r_count.id }}" value="추천">
                 <p id="count{{ r_count.n_id }}">추천: {{ r_count.total_recommend}}</p> 
             </div>
+=======
+>>>>>>> Stashed changes
           </div>
         </div>
         <div>

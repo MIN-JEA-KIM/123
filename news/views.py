@@ -290,6 +290,7 @@ def travel(req):
 
     return render(req, "travel.html", context=context)
 
+<<<<<<< Updated upstream
 # #Ip 가져오기
 # def get_client_ip(request):
 #     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -298,6 +299,47 @@ def travel(req):
 #     else:
 #         ip = request.META.get('REMOTE_ADDR')
 #     return ip
+=======
+def view(req, n_id, pk):
+    login_session = request.session.get('login_session', '')
+    context = { 'login_session': login_session }
+
+    query = f"""
+        select v.n_id, v.hits, v.user, n.n_title, n.nd_img, nc.n_content, n.o_link
+        from Viewcount v
+        inner join N_content nc on v.n_id = nc.n_id 
+        inner join News n ns on v.n_id = n.n_id
+        where n.n_id ={n_id} 
+    """
+    news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
+    context['news'] = news
+    article = Viewcount.objects.filter(id=pk)
+    context['article'] = article
+
+    if article.user.id == login_session:
+        context['user'] = True
+    else:
+        context['user'] = False
+
+    response = render(request, 'news_post', context)
+
+    # 조회수 기능(쿠키이용)
+    expire_date, now = datetime.now(), datetime.now()
+    expire_date += timedelta(days=1)
+    expire_date -= now
+    max_age = 60*60*24*30 
+
+    cookie_value = req.COOKIES.get('news_post', '_')
+
+    if f'_{pk}_' not in cookie_value:
+        cookie_value += f'{pk}_'
+        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
+        article.hits += 1
+        article.save()
+
+    return response
+
+>>>>>>> Stashed changes
 
 def news_post(req, n_id):
 
@@ -325,6 +367,7 @@ def news_post(req, n_id):
     """
     news = News.objects.raw(query)[0]
 
+<<<<<<< Updated upstream
     article = get_object_or_404(N_content, pk=n_id) 
     
     context = {
@@ -333,14 +376,29 @@ def news_post(req, n_id):
     }
 
     response = render(req, 'news_post.html', context)
+=======
+    return render(req, "news_post.html", data)
 
-    expire_date, now = datetime.now(), datetime.now()
-    expire_date += timedelta(days=1)
-    #expire_date = expire_date.replace(hour=23, minute=0, second=0, microsecond=0)
-    expire_date -= now
-    max_age = 60*60*24*30 
+    # 조회수
 
-    cookie_value = req.COOKIES.get('news_post', '_')
+    # login_session = req.session.get('login_session')
+    # data['login_session'] =login_session
+
+    # article = get_object_or_404(Viewcount, pk=n_id)
+    # data['article'] = article
+
+    # if Memberinfo.id == login_session:
+    #     data['id'] = True
+    # else:
+    #     data['id'] = False
+
+    # expire_date, now = datetime.now(), datetime.now()
+    # expire_date += timedelta(days=1)
+    # expire_date -= now
+    # max_age = 60*60*24*30 
+>>>>>>> Stashed changes
+
+    # cookie_value = req.COOKIES.get('news_post', '_')
 
     if f'_{n_id}_' not in cookie_value:
         cookie_value += f'{n_id}_'
@@ -348,6 +406,7 @@ def news_post(req, n_id):
         article.hits += 1
         article.save()
 
+<<<<<<< Updated upstream
     return response
     #return render(req, "news_post.html", {'news': news, 'view': view})
     
@@ -365,6 +424,9 @@ def recommend(req):
         else:
             r_count.recommend.add(ip)
             message = 'recommned'
+=======
+    # return response
+>>>>>>> Stashed changes
 
     context = {'recommend.count' : r_count.total_recommend, 'message' : message}
     return HttpResponse(json.dumps(context), content_type='application/json')
