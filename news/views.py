@@ -388,13 +388,13 @@ def news_post(req, n_id):
     # else:
     #     data['id'] = False
 
-    # expire_date, now = datetime.now(), datetime.now()
-    # expire_date += timedelta(days=1)
-    # expire_date -= now
-    # max_age = 60*60*24*30 
+    expire_date, now = datetime.now(), datetime.now()
+    expire_date += timedelta(days=1)
+    expire_date -= now
+    max_age = 60*60*24*30 
 
 
-    # cookie_value = req.COOKIES.get('news_post', '_')
+    cookie_value = req.COOKIES.get('news_post', '_')
 
     if f'_{n_id}_' not in cookie_value:
         cookie_value += f'{n_id}_'
