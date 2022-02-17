@@ -10,7 +10,7 @@
  * Copyright 2011-2019 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
-:root {
+ :root {
   --blue: #5e50f9;
   --indigo: #6610f2;
   --purple: #6a008a;
@@ -495,11 +495,14 @@ mark,
 .img-fluid {
   width: 100%;
   height: 100%;
+  margin: 3%;
+  max-width: 450px; 
+  max-height: 253px;
 }
 
 .img-fluid1 {
-  width: 450px;
-  height: 300px;
+  width: 100%;
+  height: 100%;
 }
 
 .img-thumbnail {
@@ -635,6 +638,8 @@ pre code {
 
   margin-right: -15px;
   margin-left: -15px;
+
+  flex-wrap: wrap;
 }
 
 .no-gutters {
@@ -655,7 +660,7 @@ pre code {
 .col-lg-auto, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl,
 .col-xl-auto {
   position: relative;
-  width: 50%;
+  width: 100%;
   padding-right: 15px;
   padding-left: 15px;
 }
