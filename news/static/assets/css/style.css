@@ -501,8 +501,10 @@ mark,
 }
 
 .img-fluid1 {
-  width: 100%;
-  height: 100%;
+  display: block;
+  max-width: 100%;
+  max-width: 100vw;
+  height: auto;
 }
 
 .img-thumbnail {
@@ -10488,6 +10490,7 @@ h6, .h6 {
   margin: 10px 0;
   border-radius: 96px 0 0px 96px;
   color: #ffffff;
+  background-color: #233e6d;
 }
 
 #main-banner-carousel .owl-dots .owl-dot.active {
