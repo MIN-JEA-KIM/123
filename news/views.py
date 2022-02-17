@@ -1,6 +1,8 @@
+from telnetlib import AUTHENTICATION
+from unittest import result
 from django.shortcuts import render, redirect
 from datetime import date, datetime, timedelta
-from django.http import HttpResponse 
+from django.http import HttpResponse, JsonResponse 
 from email.policy import default
 from itertools import product
 from multiprocessing import context
@@ -318,7 +320,7 @@ def world(req): # 세계
 #         ip = request.META.get('REMOTE_ADDR')
 #     return ip
 
-def news_post(req, n_id):
+def news_post(req, n_id, id):
 
     data = {}
     scrollLog(req)
@@ -351,8 +353,7 @@ def news_post(req, n_id):
     
     login_session = req.session.get('login_session')
     
-   
-    article = get_object_or_404(N_content, pk=n_id)
+    article = get_object_or_404(N_content, pk=id)
     data['article'] = article
 
     # if req.session.get('login_session') is None:
@@ -360,10 +361,10 @@ def news_post(req, n_id):
     # else:
     #     cookie_name = f'news_post:{req.session["login_session"]["id"]}'
     
-    if Memberinfo.id == login_session:
-        data['id'] = True
+    if Memberinfo.user.id == login_session:
+        data['user'] = True
     else:
-        data['id'] = False
+        data['user'] = False
 
     response = render(req, "news_post.html", data)
 
@@ -373,10 +374,10 @@ def news_post(req, n_id):
     expire_date -= now
     max_age = 60*60*24*30 
 
-    cookie_value = req.COOKIES.get('news_post', '_')
+    cookie_value = req.COOKIES.get('news_post', '|')
 
-    if f'_{n_id}_' not in cookie_value:
-        cookie_value += f'{n_id}_'
+    if f'_{id}_' not in cookie_value:
+        cookie_value += f'{id}_'
         response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
         article.hits += 1
         article.save()

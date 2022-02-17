@@ -5,9 +5,11 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from pymysql import NULL
 
 class N_Category(models.Model):
     c_id = models.AutoField(primary_key=True)
@@ -46,7 +48,6 @@ class N_content(models.Model):
     nc_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
-    hits = models.PositiveIntegerField(blank=True, default=0, verbose_name='조회수')
     recommend = models.PositiveIntegerField(settings.AUTH_USER_MODEL, blank=True)
 
     def count_recommend(self): # total recommend
@@ -55,6 +56,13 @@ class N_content(models.Model):
     class Meta:
         managed = False
         db_table = 'N_content'
+
+class ViewCount(models.Model):
+    hits = models.PositiveIntegerField(blank=True, default=0, null= True, verbose_name='조회수')
+    user = models.ForeignKey('Memberinfo', on_delete=models.CASCADE) 
+
+    def __unicode__(self):
+        return self.hits
 
 
 class N_summarization(models.Model):
