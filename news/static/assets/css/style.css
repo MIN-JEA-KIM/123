@@ -10878,4 +10878,8 @@ footer .footer-logo {
   outline: 0;
 }
 
+.press_ul {
+  list-style:none;
+  padding-left:0px;
+}
 /*# sourceMappingURL=maps/style.css.map */
