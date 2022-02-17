@@ -354,11 +354,23 @@ def news_post(req, n_id):
     sum_list=[]
 
     while(ns_c.find('\n') != -1):
-        print(ns_c)
         sum_list.append(ns_c[:ns_c.find('\n')])
         ns_c = ns_c[ns_c.find('\n')+1:]
 
     data['ns_content'] = sum_list
+
+    n_c = news.n_content
+    cont_list=[]
+
+    # print(n_c.find('. '))
+    if n_c.find('. ') == -1:
+        cont_list.append(n_c)
+    else:
+        while(n_c.find('. ') != -1):
+            cont_list.append(n_c[:n_c.find('. ')+1])
+            n_c = n_c[n_c.find('. ')+2:]
+
+    data['n_content'] = cont_list
 
 
     login_session = req.session.get('login_session')
