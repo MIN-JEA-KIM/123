@@ -349,8 +349,21 @@ def news_post(req, n_id):
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     data['news'] = news
     
+    login_session = req.session.get('login_session')
+    
+   
     article = get_object_or_404(N_content, pk=n_id)
     data['article'] = article
+
+    # if req.session.get('login_session') is None:
+    #     cookie_name = 'news_post'
+    # else:
+    #     cookie_name = f'news_post:{req.session["login_session"]["id"]}'
+    
+    if Memberinfo.id == login_session:
+        data['id'] = True
+    else:
+        data['id'] = False
 
     response = render(req, "news_post.html", data)
 
@@ -377,10 +390,10 @@ def recommend(request):
 
     if n_rec.recommend.filter(id=user.id).exists():
         n_rec.recommend.remove(user)
-        message = '좋아요 취소'
+        message = '추천 취소'
     else:
         n_rec.recommend.add(user)
-        message = '좋아요'
+        message = '추천'
 
     context = {'recommend_count':n_rec.count_recommend_user(), 'message': message}
     return HttpResponse(json.dumps(context), content_type="application/json")
