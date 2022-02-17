@@ -88,15 +88,20 @@
               </div>
               <br>
                 <img src="{{ news.nd_img }}" class="rounded mx-auto d-block" alt="world-news"/>
-                <div class="d-flex justify-content-between align-items-center navbar-top">
+                <div class="d-flex flex-column justify-content-between align-items-center navbar-top">
+                  <h3>요약문</h3>
                   <br>
                   {{ news.ns_content }}
                   <br>
                 </div>
                 <br>  
                 <br>
-                {{ news.n_content }}
-                <br>
+                <div class="d-flex flex-column justify-content-between align-items-center navbar-top">
+                  <h3>원문</h3>
+                  <br>
+                  {{ news.n_content }}
+                  <br>
+                </div>
                 <br>   
                 <!-- 조회수 -->
                 {% csrf_token %}

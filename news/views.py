@@ -320,7 +320,7 @@ def world(req): # 세계
 #         ip = request.META.get('REMOTE_ADDR')
 #     return ip
 
-def news_post(req, n_id, id):
+def news_post(req, n_id, pk):
 
     data = {}
     scrollLog(req)
@@ -350,10 +350,16 @@ def news_post(req, n_id, id):
     """
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     data['news'] = news
+
+    # news summarization, news content 줄 바꿈 처리
+    print(news.ns_content)
+    print("============")
+    print(news.n_content)
+
     
     login_session = req.session.get('login_session')
     
-    article = get_object_or_404(N_content, pk=id)
+    article = get_object_or_404(N_content, id=pk)
     data['article'] = article
 
     # if req.session.get('login_session') is None:
@@ -374,10 +380,10 @@ def news_post(req, n_id, id):
     expire_date -= now
     max_age = 60*60*24*30 
 
-    cookie_value = req.COOKIES.get('news_post', '|')
+    cookie_value = req.COOKIES.get('news_post', '_')
 
-    if f'_{id}_' not in cookie_value:
-        cookie_value += f'{id}_'
+    if f'_{pk}_' not in cookie_value:
+        cookie_value += f'{pk}_'
         response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
         article.hits += 1
         article.save()

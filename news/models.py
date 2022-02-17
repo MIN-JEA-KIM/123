@@ -59,7 +59,7 @@ class N_content(models.Model):
 
 class ViewCount(models.Model):
     hits = models.PositiveIntegerField(blank=True, default=0, null= True, verbose_name='조회수')
-    user = models.ForeignKey('Memberinfo', on_delete=models.CASCADE) 
+    user = models.ForeignKey('Memberinfo', on_delete=models.DO_NOTHING) 
 
     def __unicode__(self):
         return self.hits
