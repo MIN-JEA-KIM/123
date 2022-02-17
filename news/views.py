@@ -350,8 +350,6 @@ def news_post(req, n_id):
     data['news'] = news
 
     # news summarization, news content 줄 바꿈 처리
-    print(news.ns_content)
-    print("============")
     ns_c = news.ns_content
     sum_list=[]
 
@@ -359,15 +357,13 @@ def news_post(req, n_id):
         print(ns_c)
         sum_list.append(ns_c[:ns_c.find('\n')])
         ns_c = ns_c[ns_c.find('\n')+1:]
-    
-    print("===========================")
-    print("0번째 : ", sum_list[0])
+
     data['ns_content'] = sum_list
 
-    
+
     login_session = req.session.get('login_session')
     
-   
+    # 조회수
     # article = get_object_or_404(N_content, pk=n_id)
     # data['article'] = article
 
