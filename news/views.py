@@ -49,7 +49,7 @@ def scrollLog(req):
     print(f"HTTP_X_FORWARDED_FOR = {req.META.get('HTTP_X_FORWARDED_FOR')}, REMOTE_ADDR = {req.META.get('REMOTE_ADDR')}, HTTP_X_REAL_IP = {req.META.get('HTTP_X_REAL_IP')}")
 
 
-def author(req):
+def author(req, p_id=1):
     data = {}
     scrollLog(req)
 
@@ -73,7 +73,30 @@ def author(req):
         # "post_latest": post_latest
     }
 
-    return render(req, "author.html", context=context)
+    press_query='select * from Press order by p_id'
+    sel_press_query=f"""
+    select p.p_id, p_name, n.n_id, cd_id, n_title, nd_img, n_input, o_link, nso_id, nso_content
+    from Press p
+    inner join News n on p.p_id = n.p_id
+    inner join N_summarization_one nso on n.n_id = nso.n_id
+    where n.p_id = {p_id}
+    order by n.n_id desc
+    """
+
+    press_list = Press.objects.raw(press_query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
+    sel_press_list = Press.objects.raw(sel_press_query)
+    # news_list 페이징 처리
+    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
+    paginator = Paginator(sel_press_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+
+    data['press_list'] = press_list
+    data['sel_press_list'] = sel_press_list
+    data['page_obj'] = page_obj
+
+    response = render(req, "author.html", data)
+
+    return response
 
 
 def politics(req): # 정치
