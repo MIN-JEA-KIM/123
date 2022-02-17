@@ -10399,11 +10399,6 @@ h6, .h6 {
   margin-right: 10px;
 }
 
-.carousel-image {
-    width: 1140px;
-    height: 400px;
-}
-
 .fs-10 {
   font-size: 10px;
 }
@@ -10472,7 +10467,6 @@ h6, .h6 {
   flex-direction: column;
   height: 100%;
   margin: 0;
-  padding: 40px 0;
 }
 
 @media (max-width: 1024px) {
