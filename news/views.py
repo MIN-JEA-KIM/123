@@ -102,6 +102,7 @@ def politics(req): # 정치
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 100
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -141,6 +142,7 @@ def economy(req): # 경제
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 101
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -180,6 +182,7 @@ def society(req): # 사회
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 102
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -219,6 +222,7 @@ def life(req): # 생활문화
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 103
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -258,6 +262,7 @@ def IT(req): # IT/과학
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 104
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -297,6 +302,7 @@ def world(req): # 세계
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 105
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
