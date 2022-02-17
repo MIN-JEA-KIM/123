@@ -384,20 +384,20 @@ def news_post(req, n_id):
     # else:
     #     cookie_name = f'news_post:{req.session["login_session"]["id"]}'
     
-    # if Memberinfo.id == login_session:
-    #     data['id'] = True
-    # else:
-    #     data['id'] = False
+    if Memberinfo.id == login_session:
+        data['id'] = True
+    else:
+        data['id'] = False
 
-    # response = render(req, "news_post.html", data)
+    response = render(req, "news_post.html", data)
 
-    # expire_date, now = datetime.now(), datetime.now()
-    # expire_date += timedelta(days=1)
-    # #expire_date = expire_date.replace(hour=23, minute=0, second=0, microsecond=0)
-    # expire_date -= now
-    # max_age = 60*60*24*30 
+    expire_date, now = datetime.now(), datetime.now()
+    expire_date += timedelta(days=1)
+    #expire_date = expire_date.replace(hour=23, minute=0, second=0, microsecond=0)
+    expire_date -= now
+    max_age = 60*60*24*30 
 
-    # cookie_value = req.COOKIES.get('news_post', '_')
+    cookie_value = req.COOKIES.get('news_post', '_')
 
     # if f'_{n_id}_' not in cookie_value:
     #     cookie_value += f'{n_id}_'
@@ -407,6 +407,7 @@ def news_post(req, n_id):
 
     return response
 
+# 좋아요 기능
 def recommend(request):
     pk = request.POST.get('pk', None)
     n_rec = get_object_or_404(N_content, pk=pk)
