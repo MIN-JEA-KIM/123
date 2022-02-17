@@ -49,7 +49,6 @@ class N_content(models.Model):
     nc_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
-    hits = models.ForeignKey('Viewcount', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
