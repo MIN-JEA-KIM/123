@@ -14,13 +14,8 @@ urlpatterns = [
     path("world/", views.world, name="world"),
     path("travel/", views.travel, name="travel"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
-<<<<<<< Updated upstream
-    path('recommend/', views.recommend, name='recommend'),
-]
-=======
+    path("memberinfo/", views.memberinfo, name="memberinfo"),
     # path('news_post/<int:n_id>/view/', views.view, name='view'),
     # path('<int:n_id>', views.view, name='view'),
-    path("memberinfo/", views.memberinfo, name="memberinfo"),
 ]
 
->>>>>>> Stashed changes

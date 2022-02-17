@@ -45,16 +45,10 @@ class News(models.Model):
         managed = False
         db_table = 'News'
 
-<<<<<<< Updated upstream
-=======
-
 class N_content(models.Model):
     nc_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
-
-    def count_recommend(self): # total recommend
-        return self.recommend.count()
 
     class Meta:
         managed = False
@@ -68,7 +62,6 @@ class Viewcount(models.Model):
     def __unicode__(self):
         return self.hits
 
->>>>>>> Stashed changes
 class N_summarization(models.Model):
     ns_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)

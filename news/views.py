@@ -290,7 +290,7 @@ def travel(req):
 
     return render(req, "travel.html", context=context)
 
-<<<<<<< Updated upstream
+
 # #Ip 가져오기
 # def get_client_ip(request):
 #     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -299,7 +299,7 @@ def travel(req):
 #     else:
 #         ip = request.META.get('REMOTE_ADDR')
 #     return ip
-=======
+
 def view(req, n_id, pk):
     login_session = request.session.get('login_session', '')
     context = { 'login_session': login_session }
@@ -339,7 +339,6 @@ def view(req, n_id, pk):
 
     return response
 
->>>>>>> Stashed changes
 
 def news_post(req, n_id):
 
@@ -367,7 +366,6 @@ def news_post(req, n_id):
     """
     news = News.objects.raw(query)[0]
 
-<<<<<<< Updated upstream
     article = get_object_or_404(N_content, pk=n_id) 
     
     context = {
@@ -376,8 +374,6 @@ def news_post(req, n_id):
     }
 
     response = render(req, 'news_post.html', context)
-=======
-    return render(req, "news_post.html", data)
 
     # 조회수
 
@@ -396,7 +392,7 @@ def news_post(req, n_id):
     # expire_date += timedelta(days=1)
     # expire_date -= now
     # max_age = 60*60*24*30 
->>>>>>> Stashed changes
+
 
     # cookie_value = req.COOKIES.get('news_post', '_')
 
@@ -406,32 +402,10 @@ def news_post(req, n_id):
         article.hits += 1
         article.save()
 
-<<<<<<< Updated upstream
+
     return response
     #return render(req, "news_post.html", {'news': news, 'view': view})
     
-
-@require_POST
-def recommend(req):
-    if req.method == 'POST':
-        ip = request.ip # ip를 가져온다.
-        n_id = request.POST.get('pk', None)
-        r_count = N_content.objects.get(pk = n_id)
-
-        if r_count.recommend.filter(id = ip.id).exists(): #이미 해당 유저가 likes컬럼에 존재하면
-            r_count.recommend.remove(ip) #likes 컬럼에서 해당 유저를 지운다.
-            message = 'ip o'
-        else:
-            r_count.recommend.add(ip)
-            message = 'recommned'
-=======
-    # return response
->>>>>>> Stashed changes
-
-    context = {'recommend.count' : r_count.total_recommend, 'message' : message}
-    return HttpResponse(json.dumps(context), content_type='application/json')
-    # dic 형식을 json 형식으로 바꾸어 전달한다.
-     
 def index(req):
 
     scrollLog(req)
@@ -512,3 +486,58 @@ def want_category(c_id):
         where c_id = {c_id} and n_input != '9999-12-31 00:00:00'
         order by n_input desc"""
     return query
+
+def memberinfo(req):
+    # memberinfo 으로 POST 요청이 왔을 때, 새로운 유저를 만드는 절차를 밟는다.
+    if req.method == 'POST':
+        # password 와 password1에 입력된 값이 같다면
+        if req.POST['password'] == req.POST['password1'] :
+            
+            query = f"select id, email from memberinfo where id = '{req.POST['id']}' or email = '{req.POST['email']}'"
+            
+            id_email = Memberinfo.objects.raw(query)
+            try:
+                if id_email != None:
+
+                    f_id = id_email[0].id
+                    f_email = id_email[0].email
+
+                    if req.POST['id'] == f_id :
+
+                        return render(req, 'memberinfo.html', {'error' : "같은 아이디가 있음"})
+
+                    if req.POST['email'] == f_email:
+
+                        return render(req, 'memberinfo.html', {'error' : "같은 이메일이 있음"})
+            except:
+                # 객체를 새로 생성
+                user = Memberinfo(id=req.POST['id'], password=req.POST['password'], name=req.POST['name'], birth=req.POST['birth'], sex=req.POST['sex'], email=req.POST['email'], phone=req.POST['phone'])
+                # DB 저장
+                user.save()
+
+                return render(req, 'memberinfo.html', {'save' : "가입완료"})
+        else:   
+            
+            return render(req, 'memberinfo.html', {'error' : "비밀번호 다름"})
+    else:
+
+        return render(req, 'memberinfo.html')
+
+
+def login(req): # 로그인
+    if req.method == 'POST':
+        u_id = req.POST['id']
+        u_password = req.POST['password']
+
+        query = f"select id, password from memberinfo where id = '{u_id}'"
+        user = Memberinfo.objects.raw(query)
+            
+        try:
+            f_password = user[0].password
+
+            if u_password == f_password:
+                return "환영합니다."
+            else:
+                return "비밀번호를 잘못 입력하셨습니다."
+        except:
+                return "없는 ID 입니다."
