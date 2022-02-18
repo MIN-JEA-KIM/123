@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 # 2022.02.10 park
-CSRF_TRUSTED_ORIGINS = ['http://*.13.209.67.210']
+CSRF_TRUSTED_ORIGINS = ['http://*.52.79.226.188']
 
 # Application definition
 
