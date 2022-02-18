@@ -1,21 +1,9 @@
-from django.shortcuts import render, redirect
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from django.http import HttpResponse 
-from email.policy import default
-from itertools import product
-from multiprocessing import context
-from re import template
-from urllib import request, response
-from django.shortcuts import redirect, render, get_object_or_404
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from .models import *
-from django.contrib import auth
 import logging
-from datetime import datetime
-from django.views.decorators.http import require_POST
 import json
 
 # -2022.01.24 park_jong_won
@@ -129,9 +117,9 @@ def politics(req): # 정치
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
-    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
-    paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
-    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+    page = req.GET.get('page', 1)  # GET 방식으로 정보를 받아오는 데이터
+    paginator = Paginator(news_list, 10)  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+    page_obj = paginator.get_page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
     data['page_obj'] = page_obj
     data['news_list'] = news_list
@@ -473,7 +461,7 @@ def index(req):
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
-        
+
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
 
@@ -491,9 +479,9 @@ def index(req):
         exec(f"data['page_obj{i}'] = page_obj{i}")
         j += 1
 
+        
     data['banners'] = NC
     return render(req, "index.html", data)
-
 
 
 def want_category(c_id):
