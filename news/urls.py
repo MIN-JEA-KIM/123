@@ -16,6 +16,6 @@ urlpatterns = [
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
     path("memberinfo/", views.memberinfo, name="memberinfo"),
     # path('news_post/<int:n_id>', views.view, name='view'),
-    # path('<int:n_id>', views.view, name='view'),
+    path('<int:n_id>', views.news_post, name='news_post'),
 ]
 

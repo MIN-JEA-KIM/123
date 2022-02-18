@@ -54,14 +54,6 @@ class N_content(models.Model):
         managed = False
         db_table = 'N_content'
 
-class Viewcount(models.Model):
-    hits = models.PositiveIntegerField(default=0, blank=True)
-    n = models.ForeignKey(News, models.DO_NOTHING)
-    user = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True)
-
-    def __unicode__(self):
-        return self.hits
-
 class N_summarization(models.Model):
     ns_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
@@ -79,28 +71,15 @@ class Press(models.Model):
         managed = False
         db_table = 'Press'
 
-class N_content(models.Model):
-    nc_id = models.AutoField(primary_key=True)
-    n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
-    n_content = models.TextField(blank=True, null=True)
-    hits = models.PositiveIntegerField(default=0, verbose_name='조회수')
-
-    class Meta:
-        managed = False
-        db_table = 'N_content'
-
-# 조회수 테이블
-class NViewcount(models.Model):
+class N_Viewcount(models.Model):
     v_id = models.IntegerField(primary_key=True)
-    hits = models.ForeignKey('N_Content', models.DO_NOTHING, db_column='hits')
-    n = models.ForeignKey('News', models.DO_NOTHING)
-    id = models.ForeignKey('Memberinfo', models.DO_NOTHING, db_column='id')
+    hits = models.PositiveIntegerField(default=0,unique=True)
+    n = models.OneToOneField('News', models.DO_NOTHING)
+    id = models.OneToOneField('Memberinfo', models.DO_NOTHING, db_column='id')
 
     class Meta:
         managed = False
         db_table = 'N_Viewcount'
-
-
 
 #2022-02-07 park-jong-won  add ScrollData,Log
 class ScrollData(models.Model):

@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from multiprocessing.connection import answer_challenge
 from django.http import HttpResponse 
 from email.policy import default
 from itertools import product
@@ -14,6 +15,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from .models import *
 from datetime import datetime
 import logging
+from django.db.models import Q, Count, F
 
 # -2022.01.24 park_jong_won
 logger = logging.getLogger('news')
@@ -282,85 +284,6 @@ def travel(req):
 
     return render(req, "travel.html", context=context)
 
-
-# #Ip 가져오기
-# def get_client_ip(request):
-#     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-#     if x_forwarded_for:
-#         ip = x_forwarded_for.split(',')[-1].strip()
-#     else:
-#         ip = request.META.get('REMOTE_ADDR')
-#     return ip
-
-# def view(req, n_id):
-#     login_session = request.session.get('login_session', '')
-#     context = { 'login_session': login_session }
-
-#     article = NewsViewcount.objects.filter(pk=n_id)
-#     context['article'] = article
-
-#     if article.user.id == login_session:
-#         context['user'] = True
-#     else:
-#         context['user'] = False
-
-#     response = render(request, 'news_post', context)
-
-#     #조회수 기능(쿠키이용)
-#     expire_date, now = datetime.now(), datetime.now()
-#     expire_date += timedelta(days=1)
-#     expire_date -= now
-#     max_age = 60*60 
-
-#     cookie_value = req.COOKIES.get('hit', '_')
-
-#     if f'_{n_id}_' not in cookie_value:
-#         cookie_value += f'{n_id}_'
-#         response.set_cookie('hit', value=cookie_value, max_age=max_age, httponly=True)
-#         article.hits += 1
-#         article.save()
-
-#     return response
-
-# def view(request, n_id):
-#     article = get_object_or_404(NewsViewcount, pk=n_id)
-#     default_view_count = article.hits
-#     article.hits = default_view_count + 1
-#     article.save()
-#     return render(request, 'news_post.html', { 'article': article })
-
-#     query = f"""
-#         select v.n_id, v.hits, v.user, n.n_title, n.nd_img, n.o_link, nc.n_content
-#         from news_viewcount v
-#         inner join News n on v.n_id = n.n_id
-#         inner join N_content nc on v.n_id = nc.n_id
-#         where v.n_id ={n_id} 
-#     """
-#     news = News.objects.raw(query)[0]
-
-#     context = {
-#         'news': news,
-#         'article': article,
-#     }
-
-#     response = render(request, 'news_post.html', context)
-    
-#     expire_date, now = datetime.now(), datetime.now()
-#     expire_date += timedelta(days=1)
-#     expire_date -= now
-#     max_age = 60*60 
-
-#     cookie_value = request.COOKIES.get('hit', '_')
-
-#     if f'_{n_id}_' not in cookie_value:
-#         cookie_value += f'{n_id}_'
-#         response.set_cookie('hit', value=cookie_value, max_age=max_age, httponly=True)
-#         article.hits += 1
-#         article.save()
-
-#     return response
-
-
 def news_post(req, n_id):
 
     data = {}
@@ -415,35 +338,83 @@ def news_post(req, n_id):
 
     data['n_content'] = cont_list
 
-
-    login_session = req.session.get('login_session')
-    data['login_session'] = login_session
+    # return render(req, "news_post.html", data)
     
-    # 조회수
-    article = get_object_or_404(N_content, pk=n_id)
-    data['article'] = article
+    article = get_object_or_404(N_Viewcount, pk=n_id)
+    context = {'article': article}
 
-    if NViewcount.id == login_session:
-        data['id'] = True
-    else:
-        data['id'] = False
+    if req.method == "GET":
+        
+        h_id: str = str(n_id)
 
-    response = render(req, "news_post.html", data)
+        if req.id.is_authenticated is True:
+            cookie_hits_key = f'hits_{req.id}'
+        # 비로그인 경우
+        else:
+            cookie_hits_key = 'hits_0'
+        
+        cookie_hits_value: str = req.COOKIES.get(cookie_hits_key, '')
 
-    expire_date, now = datetime.now(), datetime.now()
-    expire_date += timedelta(days=1)
-    expire_date -= now
-    max_age = 60*60*24*30 
+        # 쿠키에 cookie_hits_key 항목이 있는 경우
+        if cookie_hits_value != '':
+            h_id_list = cookie_hits_value.split('|')
+            # 방문한 경우는 그대로 응답
+            if h_id in h_id_list:
+                return render(req, 'news_post.html', context, data)
+            # 방문하지 않은 경우
+            else:
+                new_hits_dict = (cookie_hits_key, cookie_hits_value+f'|{h_id}')
+                article.hit = F('hit') + 1
+                article.save()
+                article.refresh_from_db()
+        # hits 가 없는 경우
+        else:
+            new_hits_dict = (cookie_hits_key,h_id)
+            article.hit = F('hit') + 1
+            article.save()
+            article.refresh_from_db()
 
-    cookie_value = req.COOKIES.get('news_post', '_')
+        response = render(request, 'news_post.html', context, data)
 
-    if f'_{n_id}_' not in cookie_value:
-        cookie_value += f'{n_id}_'
-        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
-        article.hits += 1
-        article.save()
+        midnight_kst = datetime.replace(datetime.utcnow() + timedelta(days=1, hours=9), hour=0, minute=0, second=0)
+        midnight_kst_to_utc = midnight_kst - timedelta(hours=9)
 
-    return response
+        response.set_cookie(*new_hits_dict,
+                            expires=midnight_kst_to_utc,
+                            # secure=True,
+                            httponly=True,
+                            samesite='Strict')
+        return response
+
+
+    # login_session = req.session.get('login_session')
+    # data['login_session'] = login_session
+    
+    # # 조회수
+    # article = get_object_or_404(N_content, pk=n_id)
+    # data['article'] = article
+
+    # if NViewcount.id == login_session:
+    #     data['id'] = True
+    # else:
+    #     data['id'] = False
+
+    # response = return render(req, "news_post.html", data)
+
+    # expire_date, now = datetime.now(), datetime.now()
+    # expire_date += timedelta(days=1)
+    # expire_date -= now
+    # max_age = 60*60*24*30 
+
+    # cookie_value = req.COOKIES.get('news_post', '_')
+
+    # if f'_{n_id}_' not in cookie_value:
+    #     cookie_value += f'{n_id}_'
+    #     response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
+    #     article.hits += 1
+    #     article.save()
+
+    # return response
 
 
 def index(req):
