@@ -37,16 +37,13 @@ def scrollLog(req):
 
             new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
             new_scroll_data.save()
-            print("save scroll_data")
         else:
             pass
     else:
 
         new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
         new_log.save()
-        print("save log_data")
 
-    print(f"HTTP_X_FORWARDED_FOR = {req.META.get('HTTP_X_FORWARDED_FOR')}, REMOTE_ADDR = {req.META.get('REMOTE_ADDR')}, HTTP_X_REAL_IP = {req.META.get('HTTP_X_REAL_IP')}")
 
 
 def author(req, p_id=1):
