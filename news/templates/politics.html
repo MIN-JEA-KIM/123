@@ -99,7 +99,7 @@
                 <ul class="pagination justify-content-center" style="margin-top: 2rem;">
                   <li class="page-item disabled">
                   {% if page_obj.has_previous %}
-                    <a class="abutton" href="?page=1" style="width:20%; margin: 5px;">맨 앞으로</a>
+                    
                     <a class="abutton" href="?page={{ page_obj.previous_page_number }}" style="width:20%; margin: 5px;">이전</a>
                   {% endif %}
                   </li>
@@ -119,7 +119,7 @@
                   <li class="page-item disabled">
                   {% if page_obj.has_next %}
                     <a class="abutton" href="?page={{ page_obj.next_page_number }}" style="width:20%; margin: 5px;">다음</a>
-                    <a class="abutton" href="?page={{ page_obj.paginator.num_pages }}" style="width:20%; margin: 5px;">맨 뒤로</a>
+                    
                   {% endif %}
                   </li>
                 </ul>
