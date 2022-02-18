@@ -25,16 +25,13 @@ def scrollLog(req):
 
             new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
             new_scroll_data.save()
-            print("save scroll_data")
         else:
             pass
     else:
 
         new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
         new_log.save()
-        print("save log_data")
 
-    print(f"HTTP_X_FORWARDED_FOR = {req.META.get('HTTP_X_FORWARDED_FOR')}, REMOTE_ADDR = {req.META.get('REMOTE_ADDR')}, HTTP_X_REAL_IP = {req.META.get('HTTP_X_REAL_IP')}")
 
 
 def author(req, p_id=1):
@@ -67,8 +64,8 @@ def author(req, p_id=1):
     from Press p
     inner join News n on p.p_id = n.p_id
     inner join N_summarization_one nso on n.n_id = nso.n_id
-    where n.p_id = {p_id}
-    order by n.n_id desc
+    where n.p_id = {p_id} and n_input != '9999-12-31 00:00:00'
+    order by n.n_input desc
     """
 
     press_list = Press.objects.raw(press_query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -491,7 +488,7 @@ def want_category(c_id):
         from News n 
         inner join N_summarization_one nso on n.n_id = nso.n_id 
         inner join N_category_detail det on n.cd_id = det.cd_id
-        where c_id = {c_id} and n_input != '9999-12-31 00:00:00'
+        where c_id = {c_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n_input desc"""
     return query
 
