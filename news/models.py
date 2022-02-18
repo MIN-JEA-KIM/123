@@ -83,18 +83,24 @@ class N_content(models.Model):
     nc_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
-    hits = models.PositiveIntegerField(blank=True, default=0, verbose_name='조회수')
-    recommend = models.PositiveIntegerField(default=0)
-
-    @property
-    def total_recommend(self):
-        return self.recommend.count() #추천 갯수
+    hits = models.PositiveIntegerField(default=0, verbose_name='조회수')
 
     class Meta:
         managed = False
         db_table = 'N_content'
 
 # 조회수 테이블
+class NViewcount(models.Model):
+    v_id = models.IntegerField(primary_key=True)
+    hits = models.ForeignKey('N_Content', models.DO_NOTHING, db_column='hits')
+    n = models.ForeignKey('News', models.DO_NOTHING)
+    id = models.ForeignKey('Memberinfo', models.DO_NOTHING, db_column='id')
+
+    class Meta:
+        managed = False
+        db_table = 'N_Viewcount'
+
+
 
 #2022-02-07 park-jong-won  add ScrollData,Log
 class ScrollData(models.Model):

@@ -1,11 +1,3 @@
-#추천
-try:
-    from django.utils import simplejson as json
-except ImportError:
-    import json
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-#######################################################
 from datetime import date, datetime, timedelta
 from django.http import HttpResponse 
 from email.policy import default
@@ -300,48 +292,78 @@ def travel(req):
 #         ip = request.META.get('REMOTE_ADDR')
 #     return ip
 
-def view(req, n_id, pk):
-    login_session = request.session.get('login_session', '')
-    context = { 'login_session': login_session }
+# def view(req, n_id):
+#     login_session = request.session.get('login_session', '')
+#     context = { 'login_session': login_session }
 
-    query = f"""
-        select v.n_id, v.hits, v.user, n.n_title, n.nd_img, nc.n_content, n.o_link
-        from Viewcount v
-        inner join N_content nc on v.n_id = nc.n_id 
-        inner join News n ns on v.n_id = n.n_id
-        where n.n_id ={n_id} 
-    """
-    news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
-    context['news'] = news
-    article = Viewcount.objects.filter(id=pk)
-    context['article'] = article
+#     article = NewsViewcount.objects.filter(pk=n_id)
+#     context['article'] = article
 
-    if article.user.id == login_session:
-        context['user'] = True
-    else:
-        context['user'] = False
+#     if article.user.id == login_session:
+#         context['user'] = True
+#     else:
+#         context['user'] = False
 
-    response = render(request, 'news_post', context)
+#     response = render(request, 'news_post', context)
 
-    # 조회수 기능(쿠키이용)
-    expire_date, now = datetime.now(), datetime.now()
-    expire_date += timedelta(days=1)
-    expire_date -= now
-    max_age = 60*60*24*30 
+#     #조회수 기능(쿠키이용)
+#     expire_date, now = datetime.now(), datetime.now()
+#     expire_date += timedelta(days=1)
+#     expire_date -= now
+#     max_age = 60*60 
 
-    cookie_value = req.COOKIES.get('news_post', '_')
+#     cookie_value = req.COOKIES.get('hit', '_')
 
-    if f'_{pk}_' not in cookie_value:
-        cookie_value += f'{pk}_'
-        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
-        article.hits += 1
-        article.save()
+#     if f'_{n_id}_' not in cookie_value:
+#         cookie_value += f'{n_id}_'
+#         response.set_cookie('hit', value=cookie_value, max_age=max_age, httponly=True)
+#         article.hits += 1
+#         article.save()
 
-    return response
+#     return response
+
+# def view(request, n_id):
+#     article = get_object_or_404(NewsViewcount, pk=n_id)
+#     default_view_count = article.hits
+#     article.hits = default_view_count + 1
+#     article.save()
+#     return render(request, 'news_post.html', { 'article': article })
+
+#     query = f"""
+#         select v.n_id, v.hits, v.user, n.n_title, n.nd_img, n.o_link, nc.n_content
+#         from news_viewcount v
+#         inner join News n on v.n_id = n.n_id
+#         inner join N_content nc on v.n_id = nc.n_id
+#         where v.n_id ={n_id} 
+#     """
+#     news = News.objects.raw(query)[0]
+
+#     context = {
+#         'news': news,
+#         'article': article,
+#     }
+
+#     response = render(request, 'news_post.html', context)
+    
+#     expire_date, now = datetime.now(), datetime.now()
+#     expire_date += timedelta(days=1)
+#     expire_date -= now
+#     max_age = 60*60 
+
+#     cookie_value = request.COOKIES.get('hit', '_')
+
+#     if f'_{n_id}_' not in cookie_value:
+#         cookie_value += f'{n_id}_'
+#         response.set_cookie('hit', value=cookie_value, max_age=max_age, httponly=True)
+#         article.hits += 1
+#         article.save()
+
+#     return response
 
 
 def news_post(req, n_id):
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -351,11 +373,14 @@ def news_post(req, n_id):
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
@@ -364,35 +389,51 @@ def news_post(req, n_id):
         inner join N_summarization ns on n.n_id = ns.n_id
         where n.n_id ={n_id} 
     """
-    news = News.objects.raw(query)[0]
+    news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
+    data['news'] = news
 
-    article = get_object_or_404(N_content, pk=n_id) 
+    # news summarization, news content 줄 바꿈 처리
+    ns_c = news.ns_content
+    sum_list=[]
+
+    while(ns_c.find('\n') != -1):
+        sum_list.append(ns_c[:ns_c.find('\n')])
+        ns_c = ns_c[ns_c.find('\n')+1:]
+
+    data['ns_content'] = sum_list
+
+    n_c = news.n_content
+    cont_list=[]
+
+    # print(n_c.find('. '))
+    if n_c.find('. ') == -1:
+        cont_list.append(n_c)
+    else:
+        while(n_c.find('. ') != -1):
+            cont_list.append(n_c[:n_c.find('. ')+1])
+            n_c = n_c[n_c.find('. ')+2:]
+
+    data['n_content'] = cont_list
+
+
+    login_session = req.session.get('login_session')
+    data['login_session'] = login_session
     
-    context = {
-        'news': news,
-        'article': article
-    }
-
-    response = render(req, 'news_post.html', context)
-
     # 조회수
+    article = get_object_or_404(N_content, pk=n_id)
+    data['article'] = article
 
-    # login_session = req.session.get('login_session')
-    # data['login_session'] =login_session
+    if NViewcount.id == login_session:
+        data['id'] = True
+    else:
+        data['id'] = False
 
-    # article = get_object_or_404(Viewcount, pk=n_id)
-    # data['article'] = article
-
-    # if Memberinfo.id == login_session:
-    #     data['id'] = True
-    # else:
-    #     data['id'] = False
+    response = render(req, "news_post.html", data)
 
     expire_date, now = datetime.now(), datetime.now()
     expire_date += timedelta(days=1)
     expire_date -= now
     max_age = 60*60*24*30 
-
 
     cookie_value = req.COOKIES.get('news_post', '_')
 
@@ -402,10 +443,9 @@ def news_post(req, n_id):
         article.hits += 1
         article.save()
 
-
     return response
-    #return render(req, "news_post.html", {'news': news, 'view': view})
-    
+
+
 def index(req):
 
     scrollLog(req)
