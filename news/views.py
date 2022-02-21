@@ -284,86 +284,6 @@ def travel(req):
 
     return render(req, "travel.html", context=context)
 
-# def view(req, n_id):
-#     article = get_object_or_404(N_Viewcount, n_id=n_id)
-#     context = {'article': article}
-
-#     if req.method == "GET":
-        
-#         h_id: str = str(n_id)
-
-#         if req.id.is_authenticated is True:
-#             cookie_hits_key = f'hits_{req.id}'
-#         # 비로그인 경우
-#         else:
-#             cookie_hits_key = 'hits_0'
-        
-#         cookie_hits_value: str = req.COOKIES.get(cookie_hits_key, '')
-
-#         # 쿠키에 cookie_hits_key 항목이 있는 경우
-#         if cookie_hits_value != '':
-#             h_id_list = cookie_hits_value.split('|')
-#             # 방문한 경우는 그대로 응답
-#             if h_id in h_id_list:
-#                 return render(req, 'news_post.html', context, data)
-#             # 방문하지 않은 경우
-#             else:
-#                 new_hits_dict = (cookie_hits_key, cookie_hits_value+f'|{h_id}')
-#                 article.hit = F('hit') + 1
-#                 article.save()
-#                 article.refresh_from_db()
-#         # hits 가 없는 경우
-#         else:
-#             new_hits_dict = (cookie_hits_key,h_id)
-#             article.hit = F('hit') + 1
-#             article.save()
-#             article.refresh_from_db()
-
-#         response = render(request, 'news_post.html', context, data)
-
-#         midnight_kst = datetime.replace(datetime.utcnow() + timedelta(days=1, hours=9), hour=0, minute=0, second=0)
-#         midnight_kst_to_utc = midnight_kst - timedelta(hours=9)
-
-#         response.set_cookie(*new_hits_dict,
-#                             expires=midnight_kst_to_utc,
-#                             # secure=True,
-#                             httponly=True,
-#                             samesite='Strict')
-#         return response
-
-#     login_session = request.session.get('login_session', '')
-#     context = {'login_session': login_session }
-
-    # article = get_object_or_404(N_Viewcount, n_id=n_id)
-    # context = {'article': article}
-    
-#     # 글쓴이인지 확인
-#     if N_Viewcount.id.id == login_session:
-#         context['id'] = True
-#     else:
-#         context['id'] = False
-
-    # response = render(req, 'news_post.html', context)
-
-    # 조회수 기능(쿠키이용)
-    # expire_date, now = datetime.now(), datetime.now()
-    # expire_date += timedelta(days=1)
-    # expire_date = expire_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    # expire_date -= now
-    # max_age = expire_date.total_seconds()
-
-    # cookie_value = request.COOKIES.get('news_hit', '_')
-
-    # if f'_{n_id}_' in cookie_value:
-    #     cookie_value = f'{n_id}_'
-    # else:
-    #     cookie_value += f'{n_id}_'
-    #     response.set_cookie('news_hit', value=cookie_value, max_age=max_age, httponly=True)
-    #     article.hits += 1
-    #     article.save()
-    # return response
-
-
 def news_post(req, n_id):
 
     data = {}
@@ -419,37 +339,57 @@ def news_post(req, n_id):
     data['n_content'] = cont_list
     
     # 조회수
-    # login_session = req.session.get('login_session')
-    # data['login_session'] = login_session
     try:
         article = get_object_or_404(N_Viewcount, n_id = n_id)
     except:
         article = N_Viewcount.objects.create(n_id=n_id)
     data['article'] = article
     
-    # if N_Viewcount.user == login_session:
-    #     data['id'] = True
-    # else:
-    #     data['id'] = False
+    if req.method == "GET":
+        data['article'] = article
 
-    response = render(req, "news_post.html", data)
+        n_id: str = str(article.id)
 
-    expire_date, now = datetime.now(), datetime.now()
-    expire_date += timedelta(days=1)
-    expire_date -= now
-    max_age = 60*60*24*30 
+        # 로그인 한 경우
+        if req.user.is_authenticated is True:
+            news_post = f'hits_{req.id}'
+        # 비로그인 경우
+        else:
+            news_post = 'hits_0'
 
-    cookie_value = req.COOKIES.get('news_post', '|')
+        # 쿠키로부터 방문기록 로드
+        cookie_value: str = req.COOKIES.get(news_post, '')
 
-    if f'_{n_id}_' in cookie_value:
-        cookie_value = f'{n_id}_'
-    else:
-        cookie_value += f'{n_id}_'
+        # 쿠키에 cookie_hits_key 항목이 있는 경우
+        if news_post != '':
+            n_id_list = cookie_value.split('|')
+            # 방문한 경우는 그대로 응답
+            if n_id in n_id_list:
+                return render(req, 'news_post.html', data)
+            # 방문하지 않은 경우
+            else:
+                new_hits_dict = (news_post, cookie_value+f'|{n_id}')
+                article.hits = F('hits') + 1
+                article.save()
+                article.refresh_from_db()
+        # hits 가 없는 경우
+        else:
+            new_hits_dict = (news_post, n_id)
+            article.hits = F('hits') + 1
+            article.save()
+            article.refresh_from_db()
+
+        response = render(req, 'news_post.html', data)
+
+        # 만료시간 설정
+        expire_date, now = datetime.now(), datetime.now()
+        expire_date += timedelta(days=1)
+        expire_date -= now
+        max_age = 60*60 
+
         response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
-        article.hits += 1
-        article.save()
+        return response
 
-    return response
 
 
 def index(req):

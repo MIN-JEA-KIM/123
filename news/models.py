@@ -75,7 +75,8 @@ class N_Viewcount(models.Model):
     v_id = models.AutoField(primary_key=True)
     hits = models.PositiveIntegerField(default=0)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True, db_column='id')
+    id  = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True, db_column='id')
+    # user  = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True, db_column='id')
 
 #2022-02-07 park-jong-won  add ScrollData,Log
 class ScrollData(models.Model):
