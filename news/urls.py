@@ -15,7 +15,6 @@ urlpatterns = [
     path("travel/", views.travel, name="travel"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
     path("memberinfo/", views.memberinfo, name="memberinfo"),
-    # path('<int:n_id>', views.detail, name='detail'),
-    
+    # path('<int:n_id>/view', views.view, name='view'),
 ]
 

@@ -72,14 +72,10 @@ class Press(models.Model):
         db_table = 'Press'
 
 class N_Viewcount(models.Model):
-    v_id = models.IntegerField(primary_key=True)
-    hits = models.PositiveIntegerField(default=0,unique=True)
-    n = models.ForeignKey('News', models.DO_NOTHING)
-    id = models.ForeignKey('Memberinfo', models.DO_NOTHING, db_column='id')
-
-    class Meta:
-        managed = False
-        db_table = 'N_Viewcount'
+    v_id = models.AutoField(primary_key=True)
+    hits = models.PositiveIntegerField(default=0)
+    n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True, db_column='id')
 
 #2022-02-07 park-jong-won  add ScrollData,Log
 class ScrollData(models.Model):

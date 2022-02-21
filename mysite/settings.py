@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'mathfilters',
     'login.apps.LoginConfig',
-
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
