@@ -74,8 +74,8 @@ class Press(models.Model):
 class N_Viewcount(models.Model):
     v_id = models.IntegerField(primary_key=True)
     hits = models.PositiveIntegerField(default=0,unique=True)
-    n = models.OneToOneField('News', models.DO_NOTHING)
-    id = models.OneToOneField('Memberinfo', models.DO_NOTHING, db_column='id')
+    n = models.ForeignKey('News', models.DO_NOTHING)
+    id = models.ForeignKey('Memberinfo', models.DO_NOTHING, db_column='id')
 
     class Meta:
         managed = False
