@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from django.http import HttpResponse 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from .models import *
 import logging
@@ -450,14 +450,31 @@ def index(req):
     
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
+            print("login")
 
-            data['login_massage'] = login(req)
+            # data['login_massage'] = login(req)
+            # data['session_id_check'] = False
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
 
+        # elif req.session.get('user'):
+        elif req.session.get('user', 'test'):
+            print("logout")
+            logout(req)
+            data['session_user_check'] = False
+
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
@@ -533,19 +550,42 @@ def memberinfo(req):
 
 
 def login(req): # 로그인
-    if req.method == 'POST':
-        u_id = req.POST['id']
-        u_password = req.POST['password']
 
+    #전송 받은 이메일 비밀번호 확인
+    u_id = req.POST.get('id')
+    psw = req.POST.get('password')
+
+    #유효성 처리
+    res_data={}
+    if not (u_id and psw):
+        res_data = ("모든 칸을 다 입력해주세요.",False)
+
+    else:
         query = f"select id, password from memberinfo where id = '{u_id}'"
+        # 기존(DB)에 있는 Memberinfo 모델과 같은 값인 걸 가져온다.
         user = Memberinfo.objects.raw(query)
-            
-        try:
-            f_password = user[0].password
 
-            if u_password == f_password:
-                return "환영합니다."
-            else:
-                return "비밀번호를 잘못 입력하셨습니다."
-        except:
-                return "없는 ID 입니다."
+        # 비밀번호가 맞는지 확인한다.
+        f_password = user[0].password
+        f_id = user[0].id
+
+        if f_password == psw:
+            #응답 데이터 세션에 값 추가. 수신측 쿠키에 저장됨
+            req.session['user'] = f_id, f_password
+
+            res_data = ("환영합니다.", True)
+            
+        elif f_id != u_id:
+            res_data = ("없는 아이디 입니다.", False)
+
+        else:
+            res_data = ("비밀번호가 틀렸습니다.", False)
+
+    return res_data
+
+
+def logout(req):
+    # print(req.session['user'])
+    req.session.clear()
+
+    return redirect('/')
