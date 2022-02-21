@@ -6,7 +6,7 @@ from itertools import product
 from multiprocessing import context
 from re import template
 from urllib import request, response
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views import View
 from django.shortcuts import render
@@ -28,18 +28,22 @@ def scrollLog(req):
     else:
         ip = req.META.get('REMOTE_ADDR')
 
+
     if req.method == 'POST':
-        new_scroll_data = ScrollData(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
-        new_scroll_data.save()
+        if 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+
+            new_scroll_data = ScrollData(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), staytime=req.POST['deltaTime'], scroll=req.POST['scroll'])
+            new_scroll_data.save()
+        else:
+            pass
     else:
-        new_log = Log(ipaddr=req.META.get('REMOTE_ADDR'), acstime=datetime.now(), url=req.get_full_path())
+
+        new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
         new_log.save()
 
-    print(f"HTTP_X_FORWARDED_FOR = {req.META.get('HTTP_X_FORWARDED_FOR')}, REMOTE_ADDR = {req.META.get('REMOTE_ADDR')}, HTTP_X_REAL_IP = {req.META.get('HTTP_X_REAL_IP')}")
-    return context
-
 def author(req):
-
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -49,20 +53,44 @@ def author(req):
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
-    context = {
-    }
+    press_query='select * from Press order by p_id'
+    sel_press_query=f"""
+    select p.p_id, p_name, n.n_id, cd_id, n_title, nd_img, n_input, o_link, nso_id, nso_content
+    from Press p
+    inner join News n on p.p_id = n.p_id
+    inner join N_summarization_one nso on n.n_id = nso.n_id
+    where n.p_id = {p_id} and n_input != '9999-12-31 00:00:00'
+    order by n.n_input desc
+    """
 
-    return render(req, "author.html", context)
+    press_list = Press.objects.raw(press_query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
+    sel_press_list = Press.objects.raw(sel_press_query)
+    # news_list 페이징 처리
+    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
+    paginator = Paginator(sel_press_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+
+    data['press_list'] = press_list
+    data['sel_press_list'] = sel_press_list
+    data['page_obj'] = page_obj
+
+    response = render(req, "author.html", data)
+
+    return response
 
 
 def politics(req): # 정치
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -72,11 +100,14 @@ def politics(req): # 정치
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
     query = f"""
         select * 
@@ -84,20 +115,22 @@ def politics(req): # 정치
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 100
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
-    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
-    paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
-    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+    page = req.GET.get('page', 1)  # GET 방식으로 정보를 받아오는 데이터
+    paginator = Paginator(news_list, 10)  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+    page_obj = paginator.get_page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    context = {'page_obj': page_obj, 'news_list': news_list}
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-    return render(req, "politics.html", context)
-
+    return render(req, "politics.html", data)
 
 def economy(req): # 경제
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -107,11 +140,14 @@ def economy(req): # 경제
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
     query = f"""
         select * 
@@ -119,6 +155,7 @@ def economy(req): # 경제
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 101
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -126,11 +163,15 @@ def economy(req): # 경제
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    return render(req, "economy.html", {'page_obj': page_obj, 'news_list': news_list})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
+
+    return render(req, "economy.html", data)
 
 
 def society(req): # 사회
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -140,11 +181,14 @@ def society(req): # 사회
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
     query = f"""
         select * 
@@ -152,6 +196,7 @@ def society(req): # 사회
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 102
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -159,11 +204,15 @@ def society(req): # 사회
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    return render(req, "society.html", {'page_obj': page_obj, 'news_list': news_list})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
+
+    return render(req, "society.html", data)
 
 
 def life(req): # 생활문화
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -173,11 +222,14 @@ def life(req): # 생활문화
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
     query = f"""
         select * 
@@ -185,6 +237,7 @@ def life(req): # 생활문화
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 103
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -192,11 +245,15 @@ def life(req): # 생활문화
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    return render(req, "life.html", {'page_obj': page_obj, 'news_list': news_list})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
+
+    return render(req, "life.html", data)
 
 
 def IT(req): # IT/과학
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -206,11 +263,14 @@ def IT(req): # IT/과학
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
     query = f"""
         select * 
@@ -218,6 +278,7 @@ def IT(req): # IT/과학
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 104
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -225,11 +286,15 @@ def IT(req): # IT/과학
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    return render(req, "IT.html", {'page_obj': page_obj, 'news_list': news_list})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
+
+    return render(req, "IT.html", data)
 
 
 def world(req): # 세계
 
+    data = {}
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -239,11 +304,14 @@ def world(req): # 세계
         ip = req.META.get('REMOTE_ADDR')
 
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
+        if 'id' in req.POST.keys() :
+	    
+            data['login_massage'] = login(req)
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
     else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
     query = f"""
         select * 
@@ -251,6 +319,7 @@ def world(req): # 세계
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
         where ncd.c_id = 105
+        order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
     # news_list 페이징 처리
@@ -258,31 +327,10 @@ def world(req): # 세계
     paginator = Paginator(news_list, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
     page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
 
-    return render(req, "world.html", {'page_obj': page_obj, 'news_list': news_list})
+    data['page_obj'] = page_obj
+    data['news_list'] = news_list
 
-
-def travel(req):
-
-    scrollLog(req)
-
-    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = req.META.get('REMOTE_ADDR')
-
-    if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-    else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
-
-    context = {
-
-    }
-
-    return render(req, "travel.html", context=context)
+    return render(req, "world.html", data)
 
 def news_post(req, n_id):
 
@@ -392,6 +440,8 @@ def news_post(req, n_id):
 
 def index(req):
 
+    data = {}
+
     scrollLog(req)
 
     x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
@@ -399,65 +449,59 @@ def index(req):
         ip = x_forwarded_for.split(',')[0]
     else:
         ip = req.META.get('REMOTE_ADDR')
-
+    
     if req.method == 'POST':
-        # form = TestForm(req.POST)
-        form = req.POST
-        logger.info(f"POST log [IPaddr = {ip}, scroll = {form['scroll']}, deltaTime = {form['deltaTime']}]")
-    else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]")
+        if 'id' in req.POST.keys() :
+            print("login")
 
-    raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
+            # data['login_massage'] = login(req)
+            # data['session_id_check'] = False
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+
+        # elif req.session.get('user'):
+        elif req.session.get('user', 'test'):
+            print("logout")
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
+
+    raw = f"""
+    select * 
+    from News n 
+    inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4
+    """
     NC = N_content.objects.raw(raw)
 
-    query100 = want_category(100)
-    news_list100 = News.objects.raw(query100) #models.py Board 클래스의 모든 객체를 board_list에 담음
-    query101 = want_category(101)
-    news_list101 = News.objects.raw(query101)
-    query102 = want_category(102)
-    news_list102 = News.objects.raw(query102)
-    query103 = want_category(103)
-    news_list103 = News.objects.raw(query103)
-    query104 = want_category(104)
-    news_list104 = News.objects.raw(query104)
-    query105 = want_category(105)
-    news_list105 = News.objects.raw(query105)
+    query = []
+    news_list = []
+    j = 0
+    for i in range(100, 106):
+        query.append(want_category(i))
+        raw_db = News.objects.raw(query[j])
+        news_list.append(raw_db)
+        exec(f"data['news_list{i}'] = raw_db")
+        exec(f"page{i} = req.GET.get('page', '1')")
+        exec(f"paginator{i} = Paginator(news_list[{j}], '10')")
+        exec(f"page_obj{i} = paginator{i}.page(page{i})")
+        exec(f"data['page_obj{i}'] = page_obj{i}")
+        j += 1
 
-    # news_list100 페이징 처리
-    page100 = req.GET.get('page', '1') #GET 방식으로 정보를 받아오는 데이터
-    paginator100 = Paginator(news_list100, '10') #Paginator(분할될 객체, 페이지 당 담길 객체수)
-    page_obj100 = paginator100.page(page100) #페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
-
-    page101 = req.GET.get('page', '1')
-    paginator101 = Paginator(news_list101, '10')
-    page_obj101 = paginator101.page(page101)
-
-    page102 = req.GET.get('page', '1')
-    paginator102 = Paginator(news_list102, '10')
-    page_obj102 = paginator102.page(page102)
-
-    page103 = req.GET.get('page', '1')
-    paginator103 = Paginator(news_list103, '10')
-    page_obj103 = paginator103.page(page103)
-
-    page104 = req.GET.get('page', '1')
-    paginator104 = Paginator(news_list104, '10')
-    page_obj104 = paginator104.page(page104)
-
-    page105 = req.GET.get('page', '1')
-    paginator105 = Paginator(news_list105, '10')
-    page_obj105 = paginator105.page(page105)
-
-    context = {
-        'banners': NC, 
-        'page_obj100':page_obj100, 'news_list100':news_list100, 
-        'page_obj101':page_obj101, 'news_list101':news_list101, 
-        'page_obj102':page_obj102, 'news_list102':news_list102, 
-        'page_obj103':page_obj103, 'news_list103':news_list103, 
-        'page_obj104':page_obj104, 'news_list104':news_list104, 
-        'page_obj105':page_obj105, 'news_list105':news_list105
-    }
-    return render(req, "index.html", context)
+        
+    data['banners'] = NC
+    return render(req, "index.html", data)
 
 
 def want_category(c_id):
@@ -509,19 +553,40 @@ def memberinfo(req):
 
 
 def login(req): # 로그인
-    if req.method == 'POST':
-        u_id = req.POST['id']
-        u_password = req.POST['password']
+    #전송 받은 이메일 비밀번호 확인
+    u_id = req.POST.get('id')
+    psw = req.POST.get('password')
 
+    #유효성 처리
+    res_data={}
+    if not (u_id and psw):
+        res_data = ("모든 칸을 다 입력해주세요.",False)
+
+    else:
         query = f"select id, password from memberinfo where id = '{u_id}'"
+        # 기존(DB)에 있는 Memberinfo 모델과 같은 값인 걸 가져온다.
         user = Memberinfo.objects.raw(query)
-            
-        try:
-            f_password = user[0].password
 
-            if u_password == f_password:
-                return "환영합니다."
-            else:
-                return "비밀번호를 잘못 입력하셨습니다."
-        except:
-                return "없는 ID 입니다."
+        # 비밀번호가 맞는지 확인한다.
+        f_password = user[0].password
+        f_id = user[0].id
+
+        if f_password == psw:
+            #응답 데이터 세션에 값 추가. 수신측 쿠키에 저장됨
+            req.session['user'] = f_id, f_password
+
+            res_data = ("환영합니다.", True)
+            
+        elif f_id != u_id:
+            res_data = ("없는 아이디 입니다.", False)
+
+        else:
+            res_data = ("비밀번호가 틀렸습니다.", False)
+
+    return res_data
+
+def logout(req):
+    # print(req.session['user'])
+    req.session.clear()
+
+    return redirect('/')
