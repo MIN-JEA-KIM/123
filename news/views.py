@@ -390,8 +390,6 @@ def news_post(req, n_id):
         response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
         return response
 
-
-
 def index(req):
 
     scrollLog(req)
