@@ -418,16 +418,6 @@ def news_post(req, n_id):
 
     data['n_content'] = cont_list
     
-    # query = f"""
-    # select v_id, hits, v.n_id, id
-    # from N_Viewconut v
-    # inner join News n on v.n_id = n.n_id 
-    # where v_id = {v_id}
-    # """
-    # article = N_Viewcount.objects.raw(query)
-    # data['article'] = article
-    # return render(req, "news_post.html", data)
-    
     # 조회수
     # login_session = req.session.get('login_session')
     # data['login_session'] = login_session
