@@ -48,10 +48,6 @@ class N_content(models.Model):
     nc_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
-    recommend = models.PositiveIntegerField(settings.AUTH_USER_MODEL, blank=True)
-
-    def count_recommend(self): # total recommend
-        return self.recommend.count()
 
     class Meta:
         managed = False
