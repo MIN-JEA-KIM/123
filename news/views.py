@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import *
 from django.db.models import Q, Count, F
@@ -373,20 +373,32 @@ def news_post(req, n_id):
     data['n_content'] = cont_list
 
 
-    login_session = req.session.get('login_session')
-    
-    if Memberinfo.id == login_session:
-        data['id'] = True
-    else:
-        data['id'] = False
+    try:
+        article = get_object_or_404(N_Viewcount, n_id = n_id)
+    except:
+        article = N_Viewcount.objects.create(n_id=n_id)
+    data['article'] = article
 
     response = render(req, "news_post.html", data)
 
     expire_date, now = datetime.now(), datetime.now()
     expire_date += timedelta(days=1)
     expire_date -= now
+    max_age = 60*60
+
+    cookie_value = req.COOKIES.get('news_post', '')
+
+    if f'_{n_id}_' in cookie_value:
+        cookie_value = f'{n_id}_'
+    else:
+        cookie_value += f'{n_id}_'
+        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
+        article.hits += 1
+        article.save()
 
     return response
+
+    
 
 def index(req):
     data = {}
