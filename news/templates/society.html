@@ -70,16 +70,20 @@
 
                     <div class="row mb-5">
                       <div class="col-lg-6">
-                        <img src="{{ news.nd_img }}" class="img-fluid" alt="world-news" />
+                        <a href="{% url 'news_post' news.n_id %}" style="color:black;">
+                          <img src="{{ news.nd_img }}" class="img-fluid" alt="world-news" />
+                        </a>
                       </div>
                       <div class="col-lg-6">
                         <h1 class="font-weight-600 mt-5">
                           <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                         </h1>
                         <p>
+                          <a>
+                            <strong>본문 요약 :</strong>
+                          </a>
                           {{ news.nso_content }}
                         </p>
-                        <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
                       </div>
                     </div>
                     {% endif %}

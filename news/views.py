@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
-from django.http import HttpResponse 
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import *
 import logging
-import json
 
 # -2022.02.22 park_jong_won
 import re
@@ -51,17 +49,27 @@ def author(req, p_id=1):
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
-        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
-    context = {
-        # "post_latest": post_latest
-    }
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     press_query='select * from Press order by p_id'
     sel_press_query=f"""
@@ -69,7 +77,7 @@ def author(req, p_id=1):
     from Press p
     inner join News n on p.p_id = n.p_id
     inner join N_summarization_one nso on n.n_id = nso.n_id
-    where n.p_id = {p_id} and n_input != '9999-12-31 00:00:00'
+    where n.p_id = {p_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
     order by n.n_input desc
     """
 
@@ -101,20 +109,34 @@ def politics(req): # 정치
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 100
+        where ncd.c_id = 100 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -141,20 +163,34 @@ def economy(req): # 경제
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 101
+        where ncd.c_id = 101 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -181,20 +217,34 @@ def society(req): # 사회
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 102
+        where ncd.c_id = 102 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -221,20 +271,34 @@ def life(req): # 생활문화
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 103
+        where ncd.c_id = 103 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -261,20 +325,34 @@ def IT(req): # IT/과학
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 104
+        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -301,20 +379,34 @@ def world(req): # 세계
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 105
+        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -328,14 +420,6 @@ def world(req): # 세계
 
     return render(req, "world.html", data)
 
-# #Ip 가져오기
-# def get_client_ip(request):
-#     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-#     if x_forwarded_for:
-#         ip = x_forwarded_for.split(',')[0]
-#     else:
-#         ip = request.META.get('REMOTE_ADDR')
-#     return ip
 
 def news_post(req, n_id):
 
@@ -350,20 +434,34 @@ def news_post(req, n_id):
 
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-	    
-            data['login_massage'] = login(req)
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
-    else:
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
         inner join N_summarization ns on n.n_id = ns.n_id
-        where n.n_id ={n_id} 
+        where n.n_id ={n_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
     """
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     data['news'] = news
@@ -381,7 +479,6 @@ def news_post(req, n_id):
     n_c = news.n_content
     cont_list=[]
 
-    # print(n_c.find('. '))
     if n_c.find('. ') == -1:
         cont_list.append(n_c)
     else:
@@ -392,55 +489,32 @@ def news_post(req, n_id):
     data['n_content'] = cont_list
 
 
-    login_session = req.session.get('login_session')
-    
-    # 조회수
-    # article = get_object_or_404(N_content, pk=n_id)
-    # data['article'] = article
-
-    # if req.session.get('login_session') is None:
-    #     cookie_name = 'news_post'
-    # else:
-    #     cookie_name = f'news_post:{req.session["login_session"]["id"]}'
-    
-    if Memberinfo.id == login_session:
-        data['id'] = True
-    else:
-        data['id'] = False
+    try:
+        article = get_object_or_404(N_Viewcount, n_id = n_id)
+    except:
+        article = N_Viewcount.objects.create(n_id=n_id)
+    data['article'] = article
 
     response = render(req, "news_post.html", data)
 
     expire_date, now = datetime.now(), datetime.now()
     expire_date += timedelta(days=1)
-    #expire_date = expire_date.replace(hour=23, minute=0, second=0, microsecond=0)
     expire_date -= now
-    max_age = 60*60*24*30 
+    max_age = 60*60
 
-    cookie_value = req.COOKIES.get('news_post', '_')
+    cookie_value = req.COOKIES.get('news_post', '')
 
-    # if f'_{n_id}_' not in cookie_value:
-    #     cookie_value += f'{n_id}_'
-    #     response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
-    #     article.hits += 1
-    #     article.save()
+    if f'_{n_id}_' in cookie_value:
+        cookie_value = f'{n_id}_'
+    else:
+        cookie_value += f'{n_id}_'
+        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
+        article.hits += 1
+        article.save()
 
     return response
 
-# 좋아요 기능
-def recommend(request):
-    pk = request.POST.get('pk', None)
-    n_rec = get_object_or_404(N_content, pk=pk)
-    user = request.user
-
-    if n_rec.recommend.filter(id=user.id).exists():
-        n_rec.recommend.remove(user)
-        message = '추천 취소'
-    else:
-        n_rec.recommend.add(user)
-        message = '추천'
-
-    context = {'recommend_count':n_rec.count_recommend_user(), 'message': message}
-    return HttpResponse(json.dumps(context), content_type="application/json")
+    
 
 def index(req):
     data = {}
@@ -455,10 +529,7 @@ def index(req):
     
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-            print("login")
 
-            # data['login_massage'] = login(req)
-            # data['session_id_check'] = False
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
@@ -466,9 +537,8 @@ def index(req):
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
 
-        # elif req.session.get('user'):
         elif req.session.get('user', 'test'):
-            print("logout")
+
             logout(req)
             data['session_user_check'] = False
 
@@ -566,7 +636,7 @@ def login(req): # 로그인
     #유효성 처리
     res_data={}
     if not (u_id and psw):
-        res_data = ("모든 칸을 다 입력해주세요.",False)
+        res_data = ("모든 칸을 채워주세요.",False)
 
     else:
         query = f"select id, password from memberinfo where id = '{u_id}'"
@@ -593,10 +663,10 @@ def login(req): # 로그인
 
 
 def logout(req):
-    # print(req.session['user'])
     req.session.clear()
 
     return redirect('/')
+<<<<<<< HEAD
 
 #  -2022.02.21 park_jong_won
 # 사용자(해당 회원)가 많이 읽은 언론사 TOP 5 (현재접속한 회원이 가장 많이 읽은 언론사 5개)
@@ -687,3 +757,6 @@ def gender_news():
 # 회원들의 연령대(10,20,30,40,50)별 많이 읽은 뉴스기사 TOP 5
 def age_news():
     ...
+=======
+    
+>>>>>>> 4199896ee2fe2f72d7d6c23eef2fbbebace9c048

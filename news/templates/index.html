@@ -120,7 +120,6 @@
                 </div>
               </div>
             </div>
-
             <!-- 내용 처리 시작 -->
             <div id="autocontent">
               <div class="page-list" style="margin-top: 2rem;">
@@ -142,10 +141,11 @@
                               <a href="{% url 'news_post' news.n_id %}" style="color:black;">{{ news.n_title }}</a>
                             </h1>
                             <p>
+                              <a>
+                                <strong>본문 요약 :</strong>
+                              </a>
                               {{ news.nso_content }}
                             </p>
-                            <!-- <a href="news_post/{{news.n_id}}'" class="font-weight-bold text-dark pt-2">Read Article</a> -->
-                            <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
                           </div>
                         </div>
                         {% endif %}
@@ -230,7 +230,7 @@
                             <p>
                               {{ news.nso_content }}
                             </p>
-                            <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
+
                           </div>
                         </div>
                         {% endif %}
@@ -315,7 +315,7 @@
                             <p>
                               {{ news.nso_content }}
                             </p>
-                            <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
+
                           </div>
                         </div>
                         {% endif %}
@@ -401,7 +401,7 @@
                             <p>
                               {{ news.nso_content }}
                             </p>
-                            <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
+
                           </div>
                         </div>
                         {% endif %}
@@ -487,7 +487,7 @@
                             <p>
                               {{ news.nso_content }}
                             </p>
-                            <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
+
                           </div>
                         </div>
                         {% endif %}
@@ -573,7 +573,7 @@
                             <p>
                               {{ news.nso_content }}
                             </p>
-                            <a href="{% url 'news_post' news.n_id %}" class="font-weight-bold text-dark pt-2">Read Article</a>
+
                           </div>
                         </div>
                         {% endif %}
