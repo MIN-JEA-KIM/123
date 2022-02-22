@@ -498,6 +498,7 @@ mark,
   margin: 3%;
   max-width: 450px; 
   max-height: 253px;
+  overflow: hidden;
 }
 
 .img-fluid1 {

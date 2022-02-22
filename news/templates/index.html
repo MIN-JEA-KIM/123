@@ -110,14 +110,22 @@
         <div class="container">
 
           <div class="world-news">
-
-            <div class="row">
-              <div class="col-sm-12">
-                <div class="d-flex position-relative  float-left">
-                  <h3 class="section-title">정치</h3>
+            <br>
+            <form action="." method="get" style="margin:auto;">
+              <!-- name="q"로 지정해야 views.py에서 get 방식으로 q값을 가져온 것과 동일하게 동작 -->
+              <input type="text" name="q" value="{{ q }}" style="width:500px;"/> 
+              <!-- value=""는 기본적으로 표시되는 항목 이름 -->
+              <input type="submit" value="검색" />
+              <br><br>
+            </form>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="d-flex position-relative  float-left">
+                    <h3 class="section-title">정치</h3>
+                  </div>
                 </div>
               </div>
-            </div>
+
             <!-- 내용 처리 시작 -->
             <div id="autocontent">
               <div class="page-list" style="margin-top: 2rem;">

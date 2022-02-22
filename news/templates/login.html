@@ -8,12 +8,13 @@
     <input name="password" type="password" style="text-align:center; width:100px; height:20px">
     <input type="submit" value="로그인">
 </form>
+<li>
+    <a class="nav-link" href="{% url 'memberinfo' %}">회원가입</a>
+</li>
 {% else %}
 <form action="." method="POST">
     {% csrf_token %}
     <button class="'btn btn-primary btn-block" onclick = "location.href = '127.0.0.1:8000/news/'">로그아웃</button>
 </form>
 {% endif %}
-    <li>
-        <a class="nav-link" href="{% url 'memberinfo' %}">회원가입</a>
-    </li>
+    
