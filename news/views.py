@@ -392,51 +392,24 @@ def news_post(req, n_id):
     except:
         article = N_Viewcount.objects.create(n_id=n_id)
     data['article'] = article
-    
-    if req.method == "GET":
-        data['article'] = article
 
-        n_id: str = str(article.id)
+    response = render(req, "news_post.html", data)
 
-        # 로그인 한 경우
-        if req.user.is_authenticated is True:
-            news_post = f'hits_{req.id}'
-        # 비로그인 경우
-        else:
-            news_post = 'hits_0'
+    expire_date, now = datetime.now(), datetime.now()
+    expire_date += timedelta(days=1)
+    max_age = 60*60*10
 
-        # 쿠키로부터 방문기록 로드
-        cookie_value: str = req.COOKIES.get(news_post, '')
+    cookie_value = req.COOKIES.get('news_post', '')
 
-        # 쿠키에 cookie_hits_key 항목이 있는 경우
-        if news_post != '':
-            n_id_list = cookie_value.split('|')
-            # 방문한 경우는 그대로 응답
-            if n_id in n_id_list:
-                return render(req, 'news_post.html', data)
-            # 방문하지 않은 경우
-            else:
-                new_hits_dict = (news_post, cookie_value+f'|{n_id}')
-                article.hits = F('hits') + 1
-                article.save()
-                article.refresh_from_db()
-        # hits 가 없는 경우
-        else:
-            new_hits_dict = (news_post, n_id)
-            article.hits = F('hits') + 1
-            article.save()
-            article.refresh_from_db()
-
-        response = render(req, 'news_post.html', data)
-
-        # 만료시간 설정
-        expire_date, now = datetime.now(), datetime.now()
-        expire_date += timedelta(days=1)
-        expire_date -= now
-        max_age = 60*60 
-
+    if f'_{n_id}_' in cookie_value:
+        cookie_value = f'{n_id}_'
+    else:
+        cookie_value += f'{n_id}_'
         response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
-        return response
+        article.hits += 1
+        article.save()
+
+    return response
 
 def index(req):
 
