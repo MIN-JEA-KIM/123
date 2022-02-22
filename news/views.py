@@ -378,9 +378,6 @@ def news_post(req, n_id):
 
     data['n_content'] = cont_list
 
-
-    login_session = req.session.get('login_session')
-    
     # 조회수
     try:
         article = get_object_or_404(N_Viewcount, n_id = n_id)
