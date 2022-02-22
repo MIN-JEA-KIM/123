@@ -52,6 +52,29 @@
         setTimeout(showClock,1000);
       }
     </script>
+    <script>
+      // var request = new XMLHttpRequest();
+      var start = Date.now();
+      var point = null;
+      window.addEventListener('scroll', function () {
+        let delta = Date.now() - start;
+        point = window.scrollY;
+        if (delta >= 3000) { //3초
+          $.ajax({
+            url: window.location,
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+              'scroll': point,
+              'deltaTime': delta,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+          })
+        }
+        start = Date.now()
+      })
+    </script>
   </head>
 
   <body onload="showClock()">

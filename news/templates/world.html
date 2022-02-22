@@ -68,9 +68,6 @@
               csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-            succes: function () {
-              alert("성공")
-            },
           })
         }
         start = Date.now()
