@@ -28,6 +28,7 @@
     <!-- endinject -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script type="text/javascript">
+      
       function showClock(){
         var currentDate = new Date();
         var divClock = document.getElementById('divClock');
@@ -69,15 +70,13 @@
                 </h7>
               </div>
               <br>
-                <img src="{{ news.nd_img }}" class="img-fluid2" alt="world-news"/>
+                <img src="{{ news.nd_img }}" class="img-fluid1" alt="world-news"/>
                 <div class="d-flex flex-column justify-content-between align-items-center navbar-top" style="line-height: 200%">
                   <h3>요약문</h3>
                   <br>
-
                   {% for nsc in ns_content %}
                     {{ nsc }} <br><br>
                   {% endfor %}
-                  
                   <br>
                 </div>
                 <br>  
@@ -90,11 +89,6 @@
                   {% endfor %}
                   <br>
                 </div>
-                <br>   
-                <!-- 조회수 -->
-                {% csrf_token %}
-                조회수: {{article.hits}}
-                <br>
           </div>
         </div>
       </div>

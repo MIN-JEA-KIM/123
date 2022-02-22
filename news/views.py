@@ -1,11 +1,9 @@
 from datetime import datetime, timedelta
-from django.http import HttpResponse 
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from .models import *
 from django.db.models import Q, Count, F
 import logging
-import json
 
 # -2022.01.24 park_jong_won
 logger = logging.getLogger('news')
@@ -55,17 +53,13 @@ def author(req, p_id=1):
     else:
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
 
-    context = {
-        # "post_latest": post_latest
-    }
-
     press_query='select * from Press order by p_id'
     sel_press_query=f"""
     select p.p_id, p_name, n.n_id, cd_id, n_title, nd_img, n_input, o_link, nso_id, nso_content
     from Press p
     inner join News n on p.p_id = n.p_id
     inner join N_summarization_one nso on n.n_id = nso.n_id
-    where n.p_id = {p_id} and n_input != '9999-12-31 00:00:00'
+    where n.p_id = {p_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
     order by n.n_input desc
     """
 
@@ -110,7 +104,7 @@ def politics(req): # 정치
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 100
+        where ncd.c_id = 100 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -150,7 +144,7 @@ def economy(req): # 경제
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 101
+        where ncd.c_id = 101 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -190,7 +184,7 @@ def society(req): # 사회
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 102
+        where ncd.c_id = 102 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -230,7 +224,7 @@ def life(req): # 생활문화
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 103
+        where ncd.c_id = 103 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -270,7 +264,7 @@ def IT(req): # IT/과학
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 104
+        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -310,7 +304,7 @@ def world(req): # 세계
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 105
+        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -323,6 +317,7 @@ def world(req): # 세계
     data['news_list'] = news_list
 
     return render(req, "world.html", data)
+
 
 def news_post(req, n_id):
 
@@ -350,7 +345,7 @@ def news_post(req, n_id):
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
         inner join N_summarization ns on n.n_id = ns.n_id
-        where n.n_id ={n_id} 
+        where n.n_id ={n_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
     """
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     data['news'] = news
@@ -368,7 +363,6 @@ def news_post(req, n_id):
     n_c = news.n_content
     cont_list=[]
 
-    # print(n_c.find('. '))
     if n_c.find('. ') == -1:
         cont_list.append(n_c)
     else:
@@ -378,28 +372,19 @@ def news_post(req, n_id):
 
     data['n_content'] = cont_list
 
-    # 조회수
-    try:
-        article = get_object_or_404(N_Viewcount, n_id = n_id)
-    except:
-        article = N_Viewcount.objects.create(n_id=n_id)
-    data['article'] = article
+
+    login_session = req.session.get('login_session')
+    
+    if Memberinfo.id == login_session:
+        data['id'] = True
+    else:
+        data['id'] = False
 
     response = render(req, "news_post.html", data)
 
     expire_date, now = datetime.now(), datetime.now()
     expire_date += timedelta(days=1)
-    max_age = 60*60*10
-
-    cookie_value = req.COOKIES.get('news_post', '')
-
-    if f'_{n_id}_' in cookie_value:
-        cookie_value = f'{n_id}_'
-    else:
-        cookie_value += f'{n_id}_'
-        response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True, samesite='Strict', secure=True)
-        article.hits += 1
-        article.save()
+    expire_date -= now
 
     return response
 
@@ -416,10 +401,7 @@ def index(req):
     
     if req.method == 'POST':
         if 'id' in req.POST.keys() :
-            print("login")
 
-            # data['login_massage'] = login(req)
-            # data['session_id_check'] = False
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
@@ -427,9 +409,8 @@ def index(req):
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
 
-        # elif req.session.get('user'):
         elif req.session.get('user', 'test'):
-            print("logout")
+
             logout(req)
             data['session_user_check'] = False
 
@@ -551,7 +532,7 @@ def login(req): # 로그인
 
 
 def logout(req):
-    # print(req.session['user'])
     req.session.clear()
 
     return redirect('/')
+    
