@@ -42,7 +42,7 @@ def scrollLog(req):
         new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
         new_log.save()
 
-def author(req):
+def author(req, p_id=1):
     data = {}
     scrollLog(req)
 
