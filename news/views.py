@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from .models import *
+from django.db.models import Q, Count, F
 import logging
 
 # -2022.01.24 park_jong_won
@@ -386,7 +387,6 @@ def news_post(req, n_id):
     expire_date -= now
 
     return response
-
 
 def index(req):
     data = {}
