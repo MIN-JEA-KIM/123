@@ -425,21 +425,14 @@ def news_post(req, n_id):
         response = render(req, 'news_post.html', data)
 
         # 만료시간 설정
-        # midnight_kst = datetime.replace(datetime.utcnow() + timedelta(days=1, hours=9), hour=0, minute=0, second=0)
-        # midnight_kst_to_utc = midnight_kst - timedelta(hours=9)
+        midnight_kst = datetime.replace(datetime.utcnow() + timedelta(days=1, hours=9), hour=0, minute=0, second=0)
+        midnight_kst_to_utc = midnight_kst - timedelta(hours=9)
 
-        expire_date, now = datetime.now(), datetime.now()
-        expire_date += timedelta(days=1)
-        expire_date -= now
-        max_age = 60*60 
-
-        response.set_cookie('news_post', 
-		                    value=cookie_value, 
-		                    max_age=max_age, 
-	                        httponly=True,
-                            secure=True,
-                            samesite='Strict'
-		         )
+        response.set_cookie(*new_hits_dict,
+                             expires=midnight_kst_to_utc,
+                             secure=True,
+                             httponly=True,
+                             samesite='Strict')
         return response
 
 def index(req):
