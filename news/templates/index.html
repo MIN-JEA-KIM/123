@@ -72,12 +72,14 @@
       start = Date.now()
     })
   </script>
-  
+  <script type="text/javascript" src="//cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
+  <script type="text/javascript" src="//cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
   </head>
 </html>
   <body onload="showClock()">
     <div class="container-scroller">
       <div class="main-panel">
+        <div id="chart-1">{{ output|safe }}</div>
         {% include '_navbar.html' %}
         <div class="container">
           <div class="banner-top-thumb-wrap">

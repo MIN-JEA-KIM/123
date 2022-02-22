@@ -6,6 +6,11 @@ from .models import *
 import logging
 import json
 
+# -2022.02.22 park_jong_won
+import re
+from .fusioncharts import FusionCharts
+from django.db import connection
+
 # -2022.01.24 park_jong_won
 logger = logging.getLogger('news')
 
@@ -495,6 +500,9 @@ def index(req):
 
         
     data['banners'] = NC
+
+    data['output'] = individual_press("park_test_1")
+    
     return render(req, "index.html", data)
 
 
@@ -589,3 +597,93 @@ def logout(req):
     req.session.clear()
 
     return redirect('/')
+
+#  -2022.02.21 park_jong_won
+# 사용자(해당 회원)가 많이 읽은 언론사 TOP 5 (현재접속한 회원이 가장 많이 읽은 언론사 5개)
+def individual_press(user_id: str):
+    cursor = connection.cursor()
+
+    # 1. Log테이블에서 특정 사용자의 URL기록을 얻어온다.
+    query_nid_log = f"""select replace(URL,'/news/news_post/','') as nid 
+                        from Log 
+                        where user_id = '{user_id}' and URL like '/news/news_post/%'"""
+    # nid_log_objects = News.objects.raw(query_nid_log)
+    cursor.execute(query_nid_log)
+    nid_log_rows = cursor.fetchall()
+
+    # 2. n_id를 이용하여 언론사별 조회수 순위 구하기
+    limit = 5
+    query_pname_count_top = f"""select P.p_name, count(*) 
+                                from ({query_nid_log}) as UN 
+                                inner join News as N on UN.nid = N.n_id 
+                                inner join Press as P on N.p_id = P.p_id 
+                                group by P.p_id 
+                                order by count(*) DESC limit {limit}"""
+    # pname_count_top_objects = News.objects.raw(query_pname_count_top)
+    cursor.execute(query_pname_count_top)
+    pname_count_top_rows = cursor.fetchall()
+
+
+    graph = {}
+    graph['chart'] = {"caption": "Recommended Portfolio Split",
+                    "subCaption" : "For a net-worth of $1M",
+                    "showValues":"1",
+                    "showPercentInTooltip" : "0",
+                    "numberPrefix" : "$",
+                    "enableMultiSlicing":"1",
+                    "theme": "fusion"}
+    graph['data'] = []
+    
+    etc_count = len(nid_log_rows)
+    for pname, count in pname_count_top_rows:
+        graph['data'].append({"label": pname, "value": count})
+        etc_count -= count
+    graph['data'].append({"label": "etc", "value": etc_count})
+
+    pie3d = FusionCharts("pie3d", "ex2" , "100%", "80%", "chart-1", "json", graph)
+    # pie3d = FusionCharts("pie3d"그래프 유형, "ex2"그래프 이름 , "100%"틀의 가로, "400"틀의 세로, "chart-1"HTML태그 id, "json"데이터형식,그래프내용)
+    # 그래프내용 예시
+    """{
+        "chart": {
+            "caption": "Recommended Portfolio Split",
+            "subCaption" : "For a net-worth of $1M",
+            "showValues":"1",
+            "showPercentInTooltip" : "0",
+            "numberPrefix" : "$",
+            "enableMultiSlicing":"1",
+            "theme": "fusion"
+        },
+        "data": [{
+            "label": "Equity",
+            "value": "300000"
+        }, {
+            "label": "Debt",
+            "value": "230000"
+        }, {
+            "label": "Bullion",
+            "value": "180000"
+        }, {
+            "label": "Real-estate",
+            "value": "270000"
+        }, {
+            "label": "Insurance",
+            "value": "20000"
+        }]
+    }"""
+
+    return pie3d.render()
+
+# 사용자(해당 회원)가 많이 읽은 카테고리 TOP 5
+def individual_category():
+    cursor = connection.cursor()
+    # 1.
+    # 2.
+    
+
+# 회원들의 성별 많이 읽은 뉴스기사 TOP 5
+def gender_news():
+    ...
+
+# 회원들의 연령대(10,20,30,40,50)별 많이 읽은 뉴스기사 TOP 5
+def age_news():
+    ...
