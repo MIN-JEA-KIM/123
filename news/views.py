@@ -628,7 +628,7 @@ def login(req): # 로그인
     #유효성 처리
     res_data={}
     if not (u_id and psw):
-        res_data = ("모든 칸을 다 입력해주세요.",False)
+        res_data = ("모든 칸을 채워주세요.",False)
 
     else:
         query = f"select id, password from memberinfo where id = '{u_id}'"
