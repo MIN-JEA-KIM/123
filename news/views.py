@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from .models import *
+from django.db.models import Q, Count, F
 import logging
 import json
 
@@ -323,15 +324,6 @@ def world(req): # 세계
 
     return render(req, "world.html", data)
 
-# #Ip 가져오기
-# def get_client_ip(request):
-#     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-#     if x_forwarded_for:
-#         ip = x_forwarded_for.split(',')[0]
-#     else:
-#         ip = request.META.get('REMOTE_ADDR')
-#     return ip
-
 def news_post(req, n_id):
 
     data = {}
@@ -390,52 +382,65 @@ def news_post(req, n_id):
     login_session = req.session.get('login_session')
     
     # 조회수
-    # article = get_object_or_404(N_content, pk=n_id)
-    # data['article'] = article
-
-    # if req.session.get('login_session') is None:
-    #     cookie_name = 'news_post'
-    # else:
-    #     cookie_name = f'news_post:{req.session["login_session"]["id"]}'
+    try:
+        article = get_object_or_404(N_Viewcount, n_id = n_id)
+    except:
+        article = N_Viewcount.objects.create(n_id=n_id)
+    data['article'] = article
     
-    if Memberinfo.id == login_session:
-        data['id'] = True
-    else:
-        data['id'] = False
+    if req.method == "GET":
+        data['article'] = article
 
-    response = render(req, "news_post.html", data)
+        n_id: str = str(article.id)
 
-    expire_date, now = datetime.now(), datetime.now()
-    expire_date += timedelta(days=1)
-    #expire_date = expire_date.replace(hour=23, minute=0, second=0, microsecond=0)
-    expire_date -= now
-    max_age = 60*60*24*30 
+        # 로그인 한 경우
+        if req.user.is_authenticated is True:
+            news_post = f'hits_{req.id}'
+        # 비로그인 경우
+        else:
+            news_post = 'hits_0'
 
-    cookie_value = req.COOKIES.get('news_post', '_')
+        # 쿠키로부터 방문기록 로드
+        cookie_value: str = req.COOKIES.get(news_post, '')
 
-    # if f'_{n_id}_' not in cookie_value:
-    #     cookie_value += f'{n_id}_'
-    #     response.set_cookie('news_post', value=cookie_value, max_age=max_age, httponly=True)
-    #     article.hits += 1
-    #     article.save()
+        # 쿠키에 cookie_hits_key 항목이 있는 경우
+        if news_post != '':
+            n_id_list = cookie_value.split('|')
+            # 방문한 경우는 그대로 응답
+            if n_id in n_id_list:
+                return render(req, 'news_post.html', data)
+            # 방문하지 않은 경우
+            else:
+                new_hits_dict = (news_post, cookie_value+f'|{n_id}')
+                article.hits = F('hits') + 1
+                article.save()
+                article.refresh_from_db()
+        # hits 가 없는 경우
+        else:
+            new_hits_dict = (news_post, n_id)
+            article.hits = F('hits') + 1
+            article.save()
+            article.refresh_from_db()
 
-    return response
+        response = render(req, 'news_post.html', data)
 
-# 좋아요 기능
-def recommend(request):
-    pk = request.POST.get('pk', None)
-    n_rec = get_object_or_404(N_content, pk=pk)
-    user = request.user
+        # 만료시간 설정
+        # midnight_kst = datetime.replace(datetime.utcnow() + timedelta(days=1, hours=9), hour=0, minute=0, second=0)
+        # midnight_kst_to_utc = midnight_kst - timedelta(hours=9)
 
-    if n_rec.recommend.filter(id=user.id).exists():
-        n_rec.recommend.remove(user)
-        message = '추천 취소'
-    else:
-        n_rec.recommend.add(user)
-        message = '추천'
+        expire_date, now = datetime.now(), datetime.now()
+        expire_date += timedelta(days=1)
+        expire_date -= now
+        max_age = 60*60 
 
-    context = {'recommend_count':n_rec.count_recommend_user(), 'message': message}
-    return HttpResponse(json.dumps(context), content_type="application/json")
+        response.set_cookie('news_post', 
+		                    value=cookie_value, 
+		                    max_age=max_age, 
+	                        httponly=True,
+                            secure=True,
+                            samesite='Strict'
+		         )
+        return response
 
 def index(req):
     data = {}

@@ -57,14 +57,6 @@ class N_content(models.Model):
         managed = False
         db_table = 'N_content'
 
-class ViewCount(models.Model):
-    hits = models.PositiveIntegerField(blank=True, default=0, null= True, verbose_name='조회수')
-    user = models.ForeignKey('Memberinfo', on_delete=models.DO_NOTHING) 
-
-    def __unicode__(self):
-        return self.hits
-
-
 class N_summarization(models.Model):
     ns_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
@@ -82,6 +74,12 @@ class Press(models.Model):
     class Meta:
         managed = False
         db_table = 'Press'
+
+class N_Viewcount(models.Model):
+    v_id = models.AutoField(primary_key=True)
+    hits = models.PositiveIntegerField(default=0)
+    n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
+    id  = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True, db_column='id')
 
 # 2022-02-07 park-jong-won  add ScrollData,Log
 class ScrollData(models.Model):
