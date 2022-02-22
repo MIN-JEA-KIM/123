@@ -12,7 +12,6 @@ urlpatterns = [
     path("life/", views.life, name="life"),
     path("IT/", views.IT, name="IT"),
     path("world/", views.world, name="world"),
-    path("travel/", views.travel, name="travel"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
     path("memberinfo/", views.memberinfo, name="memberinfo"),
 ]
