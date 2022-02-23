@@ -4,6 +4,11 @@ from django.core.paginator import Paginator
 from .models import *
 import logging
 
+# -2022.02.22 park_jong_won
+import re
+from .fusioncharts import FusionCharts
+from django.db import connection
+
 # -2022.01.24 park_jong_won
 logger = logging.getLogger('news')
 
@@ -565,6 +570,9 @@ def index(req):
 
         
     data['banners'] = NC
+
+    data['output'] = individual_press("park_test_1")
+    
     return render(req, "index.html", data)
 
 
@@ -659,7 +667,7 @@ def logout(req):
 
     return redirect('/')
 
-
+  
 def search(req):
     data = {}
     scrollLog(req)
