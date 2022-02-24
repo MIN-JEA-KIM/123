@@ -90,6 +90,7 @@ class ScrollData(models.Model):
         db_table = 'Scroll_Data'
 
 class Log(models.Model):
+    user = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True)
     ipaddr = models.CharField(db_column='IPaddr', max_length=15, db_collation='utf8_general_ci', blank=True, null=True)  # Field name made lowercase.
     acstime = models.DateTimeField(blank=True, null=True, auto_now = True)
     url = models.CharField(db_column='URL', max_length=45, blank=True, null=True)  # Field name made lowercase.

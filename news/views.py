@@ -3,6 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import *
 import logging
+# -2022.02.22 park_jong_won
+from .fusioncharts import FusionCharts
+from django.db import connection
 
 # -2022.01.24 park_jong_won
 logger = logging.getLogger('news')
@@ -25,9 +28,12 @@ def scrollLog(req):
             new_scroll_data.save()
         else:
             pass
-    else:
-
-        new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
+    else: # get
+        session_user = req.session.get('user','guest')
+        if session_user == 'guest':
+            new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path())
+        else:
+            new_log = Log(ipaddr=ip, acstime=datetime.now(), url=req.get_full_path(), user_id=session_user[0])
         new_log.save()
 
 
@@ -64,7 +70,6 @@ def author(req, p_id=1):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     press_query='select * from Press order by p_id'
     sel_press_query=f"""
@@ -124,7 +129,6 @@ def politics(req): # 정치
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -178,7 +182,6 @@ def economy(req): # 경제
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -232,7 +235,6 @@ def society(req): # 사회
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -286,7 +288,6 @@ def life(req): # 생활문화
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -340,14 +341,13 @@ def IT(req): # IT/과학
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
+        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -394,14 +394,13 @@ def world(req): # 세계
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
+        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -449,7 +448,6 @@ def news_post(req, n_id):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
@@ -544,7 +542,6 @@ def index(req):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id inner join N_summarization_one nso on n.n_id = nso.n_id  where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
@@ -563,8 +560,8 @@ def index(req):
         exec(f"data['page_obj{i}'] = page_obj{i}")
         j += 1
 
-        
     data['banners'] = NC
+    
     return render(req, "index.html", data)
 
 
@@ -578,8 +575,6 @@ def want_category(c_id):
         where c_id = {c_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n_input desc"""
     return query
-
-
 
 
 def memberinfo(req):
@@ -635,21 +630,20 @@ def login(req): # 로그인
         # 기존(DB)에 있는 Memberinfo 모델과 같은 값인 걸 가져온다.
         user = Memberinfo.objects.raw(query)
 
-        # 비밀번호가 맞는지 확인한다.
-        f_password = user[0].password
-        f_id = user[0].id
-
-        if f_password == psw:
-            #응답 데이터 세션에 값 추가. 수신측 쿠키에 저장됨
-            req.session['user'] = f_id, f_password
-
-            res_data = ("환영합니다.", True)
-            
-        elif f_id != u_id:
+        if len(user) == 0:
             res_data = ("없는 아이디 입니다.", False)
-
         else:
-            res_data = ("비밀번호가 틀렸습니다.", False)
+            f_password = user[0].password
+            f_id = user[0].id
+            # 비밀번호가 맞는지 확인한다.
+            if f_password == psw:
+                #응답 데이터 세션에 값 추가. 수신측 쿠키에 저장됨
+                req.session['user'] = f_id, f_password
+
+                res_data = ("환영합니다.", True)
+
+            else:
+                res_data = ("비밀번호가 틀렸습니다.", False)
 
     return res_data
 
@@ -714,3 +708,212 @@ def search(req):
     data['page_obj'] = page_obj
 
     return render(req, 'search.html', data)
+
+
+def mypage(req):
+
+    data = {}
+    scrollLog(req)
+
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
+    if req.method == 'POST':
+        if 'id' in req.POST.keys() :
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+            return redirect('index')
+
+    else : # GET
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
+
+    user_id = req.session.get('user')[0]
+    data['output'] = individual_press(user_id)
+    
+    return render(req, 'mypage.html', data)
+
+
+#  -2022.02.21 park_jong_won
+# 사용자(해당 회원)가 많이 읽은 언론사 TOP 5 (현재접속한 회원이 가장 많이 읽은 언론사 5개)
+def individual_press(user_id: str):
+    cursor = connection.cursor()
+
+    # 1. Log테이블에서 특정 사용자의 URL기록을 얻어온다.
+    query_nid_log = f"""select replace(URL,'/news/news_post/','') as nid 
+                        from Log 
+                        where user_id = '{user_id}' and URL like '/news/news_post/%'"""
+    # nid_log_objects = News.objects.raw(query_nid_log)
+    cursor.execute(query_nid_log)
+    nid_log_rows = cursor.fetchall()
+
+    # 2. n_id를 이용하여 언론사별 조회수 순위 구하기
+    limit = 5
+    query_pname_count_top = f"""select P.p_name, count(*) 
+                                from ({query_nid_log}) as UN 
+                                inner join News as N on UN.nid = N.n_id 
+                                inner join Press as P on N.p_id = P.p_id 
+                                group by P.p_id 
+                                order by count(*) DESC limit {limit}"""
+    # pname_count_top_objects = News.objects.raw(query_pname_count_top)
+    cursor.execute(query_pname_count_top)
+    pname_count_top_rows = cursor.fetchall()
+
+    # 얻어온 데이터를 바탕으로 그래프를 그린다.
+    graph = {}
+    graph['chart'] = {"caption": "내가 본 언론사 비율",
+                    "subCaption" : "",
+                    "showValues":"1",
+                    "showPercentInTooltip" : "0",
+                    "numberPrefix" : "$",
+                    "enableMultiSlicing":"1",
+                    "theme": "fusion"}
+    graph['data'] = []
+    
+    etc_count = len(nid_log_rows)  # 전체 데이터에서 순위권데이터를 빼서 나머지 데이터의 크기를 구하기위한 값
+    for pname, count in pname_count_top_rows:
+        graph['data'].append({"label": pname, "value": count})
+        etc_count -= count
+    graph['data'].append({"label": "etc", "value": etc_count})
+
+    pie3d = FusionCharts("pie3d", "ex2" , "100%", "80%", "chart-1", "json", graph)
+    # pie3d = FusionCharts("pie3d"그래프 유형, "ex2"그래프 이름 , "100%"틀의 가로, "400"틀의 세로, "chart-1"HTML태그 id, "json"데이터형식,그래프내용)
+    # 그래프내용 예시
+    """{
+        "chart": {
+            "caption": "Recommended Portfolio Split",
+            "subCaption" : "For a net-worth of $1M",
+            "showValues":"1",
+            "showPercentInTooltip" : "0",
+            "numberPrefix" : "$",
+            "enableMultiSlicing":"1",
+            "theme": "fusion"
+        },
+        "data": [{
+            "label": "Equity",
+            "value": "300000"
+        }, {
+            "label": "Debt",
+            "value": "230000"
+        }, {
+            "label": "Bullion",
+            "value": "180000"
+        }, {
+            "label": "Real-estate",
+            "value": "270000"
+        }, {
+            "label": "Insurance",
+            "value": "20000"
+        }]
+    }"""
+
+    return pie3d.render()
+
+# 사용자(해당 회원)가 많이 읽은 카테고리 TOP 5
+def individual_category(user_id: str):
+    cursor = connection.cursor()
+
+    # 1. Log테이블에서 특정 사용자의 URL안에있는 nid를 얻어온다.
+    query_nid_log = f"""select replace(URL,'/news/news_post/','') as nid 
+                        from Log 
+                        where user_id = '{user_id}' and URL like '/news/news_post/%'"""
+    cursor.execute(query_nid_log)
+    nid_log_rows = cursor.fetchall()
+
+    # 2. nid를 통해 해당기사의 카테고리를 얻어 카운트한다.
+    limit = 5
+    query_cdname_count_top = f"""select n_id, NCD.cd_id, NCD.cd_name, count(NCD.cd_id) as count
+                                from {query_nid_log} as UN
+                                inner join News as N on UN.nid = N.n_id
+                                inner join N_category_detail as NCD on N.cd_id = NCD.cd_id
+                                group by NCD.cd_id
+                                order by count(*) DESC limit {limit};"""
+    
+    cursor.execute(query_cdname_count_top)
+    cdname_count_top_rows = cursor.fetchall()
+
+    # 3. 얻어온 데이터를 바탕으로 그래프를 그린다.
+    graph = {}
+    graph['chart'] = {"caption": "Recommended Portfolio Split",
+                    "subCaption" : "For a net-worth of $1M",
+                    "showValues":"1",
+                    "showPercentInTooltip" : "0",
+                    "numberPrefix" : "$",
+                    "enableMultiSlicing":"1",
+                    "theme": "fusion"}
+    graph['data'] = []
+    
+    etc_count = len(nid_log_rows)  # 전체 데이터에서 순위권데이터를 빼서 나머지 데이터의 크기를 구하기위한 값
+    for n_id, cd_id, cd_name, count in cdname_count_top_rows:
+        graph['data'].append({"label": cd_name, "value": count})
+        etc_count -= count
+    graph['data'].append({"label": "etc", "value": etc_count})
+
+    pie3d = FusionCharts("pie3d", "individual_category" , "100%", "80%", "individual_category_chart", "json", graph)
+
+    return pie3d.render()
+
+
+# 모든 회원들의 성별 많이 읽은 뉴스기사 TOP 5
+def gender_news():
+    cursor = connection.cursor()
+
+     # 1. Log테이블에서 특정 사용자의 URL안에있는 nid를 얻어온다.
+    query_nid_userid_log = f"""select replace(URL,'/news/news_post/','') as nid, user_id 
+                                from Log 
+                                where URL like '/news/news_post/%' and user_id is not null """
+    cursor.execute(query_nid_userid_log)
+    nid_log_rows = cursor.fetchall()
+
+    # 2. nid를 통해 해당기사를 읽은 회원들의 성별 정보를 얻어 각각 카운트한다.
+    limit = 5
+    query_cdname_count_top = f"""select n_id, NCD.cd_id, NCD.cd_name, count(NCD.cd_id) as count
+                                from {query_nid_userid_log} as UN
+                                inner join News as N on UN.nid = N.n_id
+                                inner join N_category_detail as NCD on N.cd_id = NCD.cd_id
+                                group by NCD.cd_id
+                                order by count(*) DESC limit {limit};"""
+    
+    cursor.execute(query_cdname_count_top)
+    cdname_count_top_rows = cursor.fetchall()
+
+    # 3. 얻어온 데이터를 바탕으로 그래프를 그린다.
+    graph = {}
+    graph['chart'] = {"caption": "Recommended Portfolio Split",
+                    "subCaption" : "For a net-worth of $1M",
+                    "showValues":"1",
+                    "showPercentInTooltip" : "0",
+                    "numberPrefix" : "$",
+                    "enableMultiSlicing":"1",
+                    "theme": "fusion"}
+    graph['data'] = []
+    
+    etc_count = len(nid_log_rows)  # 전체 데이터에서 순위권데이터를 빼서 나머지 데이터의 크기를 구하기위한 값
+    for n_id, cd_id, cd_name, count in cdname_count_top_rows:
+        graph['data'].append({"label": cd_name, "value": count})
+        etc_count -= count
+    graph['data'].append({"label": "etc", "value": etc_count})
+
+    pie3d = FusionCharts("pie3d", "individual_category" , "100%", "80%", "individual_category_chart", "json", graph)
+
+    return pie3d.render()
+    ...
