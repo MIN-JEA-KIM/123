@@ -111,9 +111,9 @@
 
           <div class="world-news">
             <br>
-            <form action="." method="get" style="margin:auto;">
+            <form action="search" method="get" style="text-align: center">
               <!-- name="q"로 지정해야 views.py에서 get 방식으로 q값을 가져온 것과 동일하게 동작 -->
-              <input type="text" name="q" value="{{ q }}" style="width:500px;"/> 
+              <input type="text" name="words" value="{{ words }}" style="width:500px;"/> 
               <!-- value=""는 기본적으로 표시되는 항목 이름 -->
               <input type="submit" value="검색" />
               <br><br>

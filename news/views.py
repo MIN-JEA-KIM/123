@@ -658,4 +658,59 @@ def logout(req):
     req.session.clear()
 
     return redirect('/')
-    
+
+
+def search(req):
+    data = {}
+    scrollLog(req)
+
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
+    if req.method == 'POST':
+        if 'id' in req.POST.keys() :
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
+
+    words = req.GET.get('words')
+
+    query = f"""select * 
+                from News n 
+                inner join N_content nc on n.n_id = nc.n_id 
+                inner join N_summarization_one nso on n.n_id = nso.n_id 
+                where n_title like %s and nd_img is not null and nd_img !='None'
+                order by n_input desc"""
+
+    result = News.objects.raw(query, ["%"+words+"%"])
+
+    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
+    paginator = Paginator(result, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+
+    data['result'] = result
+    data['words'] = words
+    data['page_obj'] = page_obj
+
+    return render(req, 'search.html', data)
