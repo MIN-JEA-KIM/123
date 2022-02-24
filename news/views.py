@@ -507,7 +507,6 @@ def news_post(req, n_id):
 
     return response
 
-    
 
 def index(req):
     data = {}
@@ -686,26 +685,30 @@ def search(req):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
 
     words = req.GET.get('words')
 
-    query = f"""select * 
-                from News n 
-                inner join N_content nc on n.n_id = nc.n_id 
-                inner join N_summarization_one nso on n.n_id = nso.n_id 
-                where n_title like %s and nd_img is not null and nd_img !='None'
-                order by n_input desc"""
+    if words != None:
 
-    result = News.objects.raw(query, ["%"+words+"%"])
+        query = f"""select * 
+                    from News n 
+                    inner join N_content nc on n.n_id = nc.n_id 
+                    inner join N_summarization_one nso on n.n_id = nso.n_id 
+                    where n_title like %s and nd_img is not null and nd_img !='None'
+                    order by n_input desc"""
 
-    page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
-    paginator = Paginator(result, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
-    page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+        result = News.objects.raw(query, ["%"+words+"%"])
 
-    data['result'] = result
-    data['words'] = words
-    data['page_obj'] = page_obj
+        page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
+        paginator = Paginator(result, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+        page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+
+        data['result'] = result
+        data['page_obj'] = page_obj
+    else:
+        pass
+
+    data['words'] = words    
 
     return render(req, 'search.html', data)
 
