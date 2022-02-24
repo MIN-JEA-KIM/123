@@ -17,6 +17,6 @@ urlpatterns = [
     path("memberinfo/", views.memberinfo, name="memberinfo"),
     path('news_post/', views.index, name="news_post_index"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
-    path("search/", views.search, name="search"),
+    # path("search/", views.search, name="search"),
 ]
 
