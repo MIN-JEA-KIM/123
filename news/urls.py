@@ -18,5 +18,6 @@ urlpatterns = [
     path("world/", views.world, name="world"),
     path("memberinfo/", views.memberinfo, name="memberinfo"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
+    # path('like', views.like, name='like'),
 ]
 

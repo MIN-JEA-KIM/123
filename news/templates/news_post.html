@@ -21,6 +21,9 @@
       rel="stylesheet"
       href="{% static 'assets/vendors/owl.carousel/dist/assets/owl.theme.default.min.css' %}"
     />
+     <!-- google icon -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
     <!-- End plugin css for this page -->
     <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" />
     <!-- inject:css -->
@@ -88,6 +91,7 @@
                     {{ nc }} <br><br>
                   {% endfor %}
                   <br>
+                  <!-- 조회수 -->
                   조회수: {{article.hits}}
                 </div>
           </div>

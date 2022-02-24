@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from pymysql import NULL
 
+
 class N_Category(models.Model):
     c_id = models.AutoField(primary_key=True)
     c_name = models.CharField(unique=True, max_length=5)
@@ -48,6 +49,11 @@ class N_content(models.Model):
     nc_id = models.AutoField(primary_key=True)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
     n_content = models.TextField(blank=True, null=True)
+    # article_likes = models.ManyToManyField(User, related_name='post_likes')
+    #
+    # @property
+    # def total_likes(self):
+    #     return self.article_likes.count()
 
     class Meta:
         managed = False
@@ -71,16 +77,18 @@ class Press(models.Model):
         managed = False
         db_table = 'Press'
 
+
 class N_Viewcount(models.Model):
     v_id = models.AutoField(primary_key=True)
-    hits = models.PositiveIntegerField(default=0)
+    hits = models.PositiveIntegerField(default=1)
     n = models.ForeignKey('News', models.DO_NOTHING, blank=True, null=True)
-    id  = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True, db_column='id')
+    id = models.ForeignKey('Memberinfo', models.DO_NOTHING, blank=True, null=True, db_column='id')
+
 
 # 2022-02-07 park-jong-won  add ScrollData,Log
 class ScrollData(models.Model):
     ipaddr = models.CharField(max_length=15)
-    acstime = models.DateTimeField(auto_now = True)
+    acstime = models.DateTimeField(auto_now=True)
     url = models.CharField(db_column='URL', max_length=45)  # Field name made lowercase.
     staytime = models.IntegerField()
     scroll = models.IntegerField()
@@ -89,14 +97,17 @@ class ScrollData(models.Model):
         managed = False
         db_table = 'Scroll_Data'
 
+
 class Log(models.Model):
-    ipaddr = models.CharField(db_column='IPaddr', max_length=15, db_collation='utf8_general_ci', blank=True, null=True)  # Field name made lowercase.
-    acstime = models.DateTimeField(blank=True, null=True, auto_now = True)
+    ipaddr = models.CharField(db_column='IPaddr', max_length=15, db_collation='utf8_general_ci', blank=True,
+                              null=True)  # Field name made lowercase.
+    acstime = models.DateTimeField(blank=True, null=True, auto_now=True)
     url = models.CharField(db_column='URL', max_length=45, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'Log'
+
 
 class Memberinfo(models.Model):
     id = models.CharField(primary_key=True, max_length=20)
@@ -106,6 +117,7 @@ class Memberinfo(models.Model):
     sex = models.CharField(max_length=5)
     email = models.CharField(max_length=50)
     phone = models.CharField(max_length=15)
+    # like_article = models.ManyToManyField('N_content', blank=True, related_name='like_users')
 
     class Meta:
         managed = False
