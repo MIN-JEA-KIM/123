@@ -347,7 +347,7 @@ def IT(req): # IT/과학
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
+        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -401,7 +401,7 @@ def world(req): # 세계
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
+        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
