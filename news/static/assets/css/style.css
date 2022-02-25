@@ -10450,7 +10450,7 @@ h6, .h6 {
 
 @media (max-width: 999px) {
   #main-banner-carousel .carousel-content-wrapper .carousel-content {
-    bottom: 12px;
+    top: 230px;
   }
   #main-banner-carousel .carousel-content-wrapper .carousel-content h1 {
     font-size: 20px;
