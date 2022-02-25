@@ -7,10 +7,6 @@ import logging
 from .fusioncharts import FusionCharts
 from django.db import connection
 
-# -2022.02.22 park_jong_won
-from .fusioncharts import FusionCharts
-from django.db import connection
-
 # -2022.01.24 park_jong_won
 logger = logging.getLogger('news')
 
@@ -58,6 +54,8 @@ def author(req, p_id=1):
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -66,6 +64,8 @@ def author(req, p_id=1):
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -118,6 +118,8 @@ def politics(req): # 정치
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -127,6 +129,8 @@ def politics(req): # 정치
             logout(req)
             data['session_user_check'] = False
 
+            return redirect('index')
+
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
         check = req.session.get('user', "test")
@@ -134,7 +138,7 @@ def politics(req): # 정치
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -172,6 +176,8 @@ def economy(req): # 경제
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -180,6 +186,8 @@ def economy(req): # 경제
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -226,6 +234,8 @@ def society(req): # 사회
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -234,6 +244,8 @@ def society(req): # 사회
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -280,6 +292,8 @@ def life(req): # 생활문화
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -288,6 +302,8 @@ def life(req): # 생활문화
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -334,6 +350,8 @@ def IT(req): # IT/과학
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -342,6 +360,8 @@ def IT(req): # IT/과학
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -388,6 +408,8 @@ def world(req): # 세계
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -396,6 +418,8 @@ def world(req): # 세계
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -443,6 +467,8 @@ def news_post(req, n_id):
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -451,6 +477,8 @@ def news_post(req, n_id):
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -466,7 +494,7 @@ def news_post(req, n_id):
         from News n 
         inner join N_content nc on n.n_id = nc.n_id 
         inner join N_summarization ns on n.n_id = ns.n_id
-        where n.n_id ={n_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
+        where n.n_id = {n_id}
     """
     news = News.objects.raw(query)[0]  # models.py Board 클래스의 모든 객체를 board_list에 담음
     data['news'] = news
@@ -537,6 +565,8 @@ def index(req):
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -545,6 +575,8 @@ def index(req):
 
             logout(req)
             data['session_user_check'] = False
+
+            return redirect('index')
 
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
@@ -682,6 +714,8 @@ def search(req):
             login_massage, session_user_check = login(req)
             data['login_massage'] = login_massage
             data['session_user_check'] = session_user_check
+
+            return redirect('index')
 	        
         elif 'scroll' in req.POST.keys():
             logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
@@ -691,6 +725,8 @@ def search(req):
             logout(req)
             data['session_user_check'] = False
 
+            return redirect('index')
+
     else : # GET
         logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
         check = req.session.get('user', "test")
@@ -698,7 +734,7 @@ def search(req):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     words = req.GET.get('words', '')
 
