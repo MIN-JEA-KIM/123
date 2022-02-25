@@ -70,6 +70,7 @@ def author(req, p_id=1):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     press_query='select * from Press order by p_id'
     sel_press_query=f"""
@@ -129,6 +130,7 @@ def politics(req): # 정치
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -182,6 +184,7 @@ def economy(req): # 경제
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -235,6 +238,7 @@ def society(req): # 사회
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -288,6 +292,7 @@ def life(req): # 생활문화
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -341,6 +346,7 @@ def IT(req): # IT/과학
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -394,6 +400,7 @@ def world(req): # 세계
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select * 
@@ -448,6 +455,7 @@ def news_post(req, n_id):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
@@ -541,6 +549,7 @@ def index(req):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id inner join N_summarization_one nso on n.n_id = nso.n_id  where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
@@ -568,7 +577,7 @@ def want_category(c_id):
     
     query = f"""
         select n.n_id, p_id, n.cd_id, n_title, nd_img, n_input, o_link, nso_id, nso_content, c_id 
-        from News n 
+        from News n
         inner join N_summarization_one nso on n.n_id = nso.n_id 
         inner join N_category_detail det on n.cd_id = det.cd_id
         where c_id = {c_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
@@ -685,8 +694,9 @@ def search(req):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
 
-    words = req.GET.get('words')
+    words = req.GET.get('words', '')
 
     if words != None:
 
@@ -705,6 +715,7 @@ def search(req):
 
         data['result'] = result
         data['page_obj'] = page_obj
+
     else:
         pass
 

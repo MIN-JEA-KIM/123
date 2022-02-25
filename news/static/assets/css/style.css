@@ -10443,7 +10443,7 @@ h6, .h6 {
   width: 75%;
   position: absolute;
   left: 40px;
-  bottom: 350px;
+  top: 350px;
   color: #ffffff;
 }
 

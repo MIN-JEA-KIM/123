@@ -18,5 +18,6 @@ urlpatterns = [
     path('news_post/', views.index, name="news_post_index"),
     path("news_post/<int:n_id>", views.news_post, name="news_post"),
     path("search/", views.search, name="search"),
+    path("mypage/", views.mypage, name="mypage"),
 ]
 
