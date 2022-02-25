@@ -10484,6 +10484,30 @@ h6, .h6 {
   }
 }
 
+@media (max-width: 576px){
+  #main-banner-carousel .carousel-content-wrapper .carousel-content {
+    top: 135px;
+  }
+}
+@media (max-width: 576px){
+  #main-banner-carousel .carousel-content-wrapper .carousel-content h1 {
+      font-size: 16px;
+  }
+}
+
+@media (max-width: 576px){
+  #main-banner-carousel .carousel-content-wrapper .carousel-content h5 p {
+      font-size: 12px;
+  }
+}
+
+@media (max-width: 576px){
+  .nav-link {
+      display: block;
+      padding: 0rem 0rem;
+  }
+}
+
 #main-banner-carousel .owl-dots .owl-dot {
   font-size: 18px;
   font-weight: 600;
