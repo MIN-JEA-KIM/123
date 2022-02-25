@@ -10542,6 +10542,10 @@ h6, .h6 {
   content: counter(dots);
 }
 
+.search {
+  text-align: center;
+}
+
 .world-news,
 .popular-news {
   padding: 20px 0;
