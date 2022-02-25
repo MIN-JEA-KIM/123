@@ -70,7 +70,7 @@ def author(req, p_id=1):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     press_query='select * from Press order by p_id'
     sel_press_query=f"""
@@ -130,7 +130,7 @@ def politics(req): # 정치
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -184,7 +184,7 @@ def economy(req): # 경제
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -238,7 +238,7 @@ def society(req): # 사회
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -292,7 +292,7 @@ def life(req): # 생활문화
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -346,7 +346,7 @@ def IT(req): # IT/과학
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -400,7 +400,7 @@ def world(req): # 세계
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -455,7 +455,7 @@ def news_post(req, n_id):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
@@ -549,7 +549,7 @@ def index(req):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "화형!!!"
+            data['login_massage'] = "환영합니다."
 
     raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id inner join N_summarization_one nso on n.n_id = nso.n_id  where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
@@ -762,7 +762,10 @@ def mypage(req):
             data['login_massage'] = "화형!!!"
 
     user_id = req.session.get('user')[0]
-    data['output'] = individual_press(user_id)
+    data['individual_press'] = individual_press(user_id)
+    data['individual_category'] = individual_category(user_id)
+    data['male_news'], data['female_news'] = gender_news()
+    # data['age_news'] = age_news()
     
     return render(req, 'mypage.html', data)
 
@@ -794,7 +797,7 @@ def individual_press(user_id: str):
 
     # 얻어온 데이터를 바탕으로 그래프를 그린다.
     graph = {}
-    graph['chart'] = {"caption": "내가 본 언론사 비율",
+    graph['chart'] = {"caption": "많이 본 언론사",
                     "subCaption" : "",
                     "showValues":"1",
                     "showPercentInTooltip" : "0",
@@ -809,7 +812,7 @@ def individual_press(user_id: str):
         etc_count -= count
     graph['data'].append({"label": "etc", "value": etc_count})
 
-    pie3d = FusionCharts("pie3d", "ex2" , "100%", "80%", "chart-1", "json", graph)
+    pie3d = FusionCharts("pie3d", "individual_press" , "100%", "80%", "individual_press_chart", "json", graph)
     # pie3d = FusionCharts("pie3d"그래프 유형, "ex2"그래프 이름 , "100%"틀의 가로, "400"틀의 세로, "chart-1"HTML태그 id, "json"데이터형식,그래프내용)
     # 그래프내용 예시
     """{
@@ -856,7 +859,7 @@ def individual_category(user_id: str):
     # 2. nid를 통해 해당기사의 카테고리를 얻어 카운트한다.
     limit = 5
     query_cdname_count_top = f"""select n_id, NCD.cd_id, NCD.cd_name, count(NCD.cd_id) as count
-                                from {query_nid_log} as UN
+                                from ({query_nid_log}) as UN
                                 inner join News as N on UN.nid = N.n_id
                                 inner join N_category_detail as NCD on N.cd_id = NCD.cd_id
                                 group by NCD.cd_id
@@ -867,8 +870,8 @@ def individual_category(user_id: str):
 
     # 3. 얻어온 데이터를 바탕으로 그래프를 그린다.
     graph = {}
-    graph['chart'] = {"caption": "Recommended Portfolio Split",
-                    "subCaption" : "For a net-worth of $1M",
+    graph['chart'] = {"caption": "많이 본 카테고리",
+                    "subCaption" : "",
                     "showValues":"1",
                     "showPercentInTooltip" : "0",
                     "numberPrefix" : "$",
@@ -888,46 +891,108 @@ def individual_category(user_id: str):
 
 
 # 모든 회원들의 성별 많이 읽은 뉴스기사 TOP 5
-def gender_news():
+def gender_news() -> list:
     cursor = connection.cursor()
 
-     # 1. Log테이블에서 특정 사용자의 URL안에있는 nid를 얻어온다.
+     # 1. Log테이블에서 모든 회원들의 user_id와 URL안에있는 nid를 얻어온다.
     query_nid_userid_log = f"""select replace(URL,'/news/news_post/','') as nid, user_id 
                                 from Log 
                                 where URL like '/news/news_post/%' and user_id is not null """
-    cursor.execute(query_nid_userid_log)
-    nid_log_rows = cursor.fetchall()
+    # cursor.execute(query_nid_userid_log)
+    # nid_log_rows = cursor.fetchall()
 
-    # 2. nid를 통해 해당기사를 읽은 회원들의 성별 정보를 얻어 각각 카운트한다.
+    # 2. 각각의 기사마다 읽은 회원들의 성별로 카운트한다.
     limit = 5
-    query_cdname_count_top = f"""select n_id, NCD.cd_id, NCD.cd_name, count(NCD.cd_id) as count
-                                from {query_nid_userid_log} as UN
-                                inner join News as N on UN.nid = N.n_id
-                                inner join N_category_detail as NCD on N.cd_id = NCD.cd_id
-                                group by NCD.cd_id
-                                order by count(*) DESC limit {limit};"""
+    query_nid_male_count_top = f"""select sex, nid, N.n_title, count(*) 
+                                from ({query_nid_userid_log}) as NUlog 
+                                inner join memberinfo as m on NUlog.user_id = m.id
+                                inner join News as N on NUlog.nid = N.n_id
+                                where sex = '남자' 
+                                group by nid 
+                                order by count(*) DESC 
+                                limit {limit}"""
     
-    cursor.execute(query_cdname_count_top)
-    cdname_count_top_rows = cursor.fetchall()
+    cursor.execute(query_nid_male_count_top)
+    nid_male_count_top_rows = cursor.fetchall()
+
+    query_nid_female_count_top = f"""select sex, nid, N.n_title, count(*) 
+                                from ({query_nid_userid_log}) as NUlog 
+                                inner join memberinfo as m on NUlog.user_id = m.id 
+                                inner join News as N on NUlog.nid = N.n_id
+                                where sex = '여자' 
+                                group by nid 
+                                order by count(*) DESC 
+                                limit {limit}"""
+    cursor.execute(query_nid_female_count_top)
+    nid_female_count_top_rows = cursor.fetchall()
 
     # 3. 얻어온 데이터를 바탕으로 그래프를 그린다.
-    graph = {}
-    graph['chart'] = {"caption": "Recommended Portfolio Split",
-                    "subCaption" : "For a net-worth of $1M",
-                    "showValues":"1",
-                    "showPercentInTooltip" : "0",
-                    "numberPrefix" : "$",
-                    "enableMultiSlicing":"1",
-                    "theme": "fusion"}
-    graph['data'] = []
+    graph_male = {}
+    graph_male['chart'] = {"caption": "male",
+                        "subCaption" : "남자",
+                        "yAxisName" : "조회수",
+                        "numberPrefix" : "번",
+                        "theme": "fusion"}
+    graph_male['data'] = []
+
+    graph_female = {}
+    graph_female['chart'] = {"caption": "female",
+                            "subCaption" : "여자",
+                            "yAxisName" : "조회수",
+                            "numberSuffix" : "회",
+                            "theme": "fusion"}
+    graph_female['data'] = []
     
-    etc_count = len(nid_log_rows)  # 전체 데이터에서 순위권데이터를 빼서 나머지 데이터의 크기를 구하기위한 값
-    for n_id, cd_id, cd_name, count in cdname_count_top_rows:
-        graph['data'].append({"label": cd_name, "value": count})
-        etc_count -= count
-    graph['data'].append({"label": "etc", "value": etc_count})
+    for male, female in zip(nid_male_count_top_rows, nid_female_count_top_rows):
+        graph_male['data'].append({"label": male[2].replace('"',"'"), "value": male[-1]})
+        graph_female['data'].append({"label": female[2].replace('"',"'"), "value": female[-1]})
 
-    pie3d = FusionCharts("pie3d", "individual_category" , "100%", "80%", "individual_category_chart", "json", graph)
+    # column2d_male = FusionCharts("column2d", "male_news" , "100%", "80%", "male_news_chart", "json", graph_male)
+    # column2d_female = FusionCharts("column2d", "female_news" , "100%", "80%", "female_news_chart", "json", graph_female)
+    column2d_male = FusionCharts("column2d", "male_news" , "100%", "100%", "gender_news_chart_male", "json", graph_male)
+    column2d_female = FusionCharts("column2d", "female_news" , "100%", "100%", "gender_news_chart_female", "json", graph_female)
 
-    return pie3d.render()
+    return [column2d_male.render(), column2d_female.render()]
     ...
+
+# 회원들의 연령대(10,20,30,40,50)별 많이 읽은 뉴스기사 TOP 5 => 막대 그래프 5개
+def age_news() -> dict or list: # 수정 필요!! 2022.02.25 -park
+    cursor = connection.cursor()
+    # 1. Log에서 회원들의 user_id와 URL에서 nid를 얻어온다.
+    query_nid_userid_log = f"""select replace(URL,'/news/news_post/','') as nid, user_id 
+                                from Log 
+                                where URL like '/news/news_post/%' and user_id is not null """
+    
+    # 2. 얻어온 데이터로 회원들의 나이대별로 nid를 카운트 한다.
+    limit = 5
+    nid_age_group_tables = []
+    for age_group in range(1,6):
+        query_nid_age_group = f"""select N.n_title, user_id, count(*) as count
+                                from ({query_nid_userid_log}) as NUlog
+                                inner join memberinfo as m on NUlog.user_id = m.id
+                                inner join News as N on NUlog.nid = N.n_id
+                                where timestampdiff(year, birth, now()) > {age_group*10} and timestampdiff(year, birth, now()) < {(age_group+1)*10}
+                                group by nid
+                                order by count DESC limit {limit}"""
+        cursor.execute(query_nid_age_group)
+        nid_age_group_tables.append(cursor.fetchall())
+
+
+    # 3. 그래프를 그린다.
+    # result = {}
+    result = []
+    for nid_age_group_rows, age_group in zip(nid_age_group_tables, range(1,6)):
+        graph = {'chart': {"caption": "top 5 news",
+                        "subCaption" : f"{age_group}_group",
+                        "yAxisName" : "조회수",
+                        "numberPrefix" : "$",
+                        "theme": "fusion"},
+                'data': []
+                }
+        for title, user_id, count in nid_age_group_rows:
+            graph['data'].append({"label": title, "value": count})
+
+        # result[f'gruop{age_group}_news'] = FusionCharts("column2d", f"gruop{age_group}_news" , "100%", "80%", "age_group_news_chart", "json", graph).render()
+        result.append(FusionCharts("column2d", f"gruop{age_group}_news" , "100%", "80%", "age_group_news_chart", "json", graph).render())
+
+    return result
