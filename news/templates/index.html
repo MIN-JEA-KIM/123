@@ -72,14 +72,18 @@
       start = Date.now()
     })
   </script>
+  <!-- 2022.02.22 park-jong-won fusionchart를 그리기 위한 스크립트-->
   <script type="text/javascript" src="//cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
   <script type="text/javascript" src="//cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
+  <!--\ 2022.02.22 park-jong-won -->
   </head>
 </html>
   <body onload="showClock()">
     <div class="container-scroller">
       <div class="main-panel">
+        <!-- 2022.02.22 park-jong-won 그래프 들어가는 자리 (삭제하셔도 되요) -->
         <div id="chart-1">{{ output|safe }}</div>
+        <!-- \park-jong-won -->
         {% include '_navbar.html' %}
         <div class="container">
           <div class="banner-top-thumb-wrap">
