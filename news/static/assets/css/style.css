@@ -498,6 +498,7 @@ mark,
   margin: 3%;
   max-width: 450px; 
   max-height: 253px;
+  overflow: hidden;
 }
 
 .img-fluid1 {
@@ -10442,13 +10443,14 @@ h6, .h6 {
   width: 75%;
   position: absolute;
   left: 40px;
-  bottom: 350px;
+  top: 350px;
   color: #ffffff;
+  text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
 }
 
 @media (max-width: 999px) {
   #main-banner-carousel .carousel-content-wrapper .carousel-content {
-    bottom: 12px;
+    top: 230px;
   }
   #main-banner-carousel .carousel-content-wrapper .carousel-content h1 {
     font-size: 20px;
@@ -10479,6 +10481,30 @@ h6, .h6 {
 @media (max-width: 767px) {
   #main-banner-carousel .owl-dots {
     padding: 10px 0;
+  }
+}
+
+@media (max-width: 576px){
+  #main-banner-carousel .carousel-content-wrapper .carousel-content {
+    top: 135px;
+  }
+}
+@media (max-width: 576px){
+  #main-banner-carousel .carousel-content-wrapper .carousel-content h1 {
+      font-size: 16px;
+  }
+}
+
+@media (max-width: 576px){
+  #main-banner-carousel .carousel-content-wrapper .carousel-content h5 p {
+      font-size: 12px;
+  }
+}
+
+@media (max-width: 576px){
+  .nav-link {
+      display: block;
+      padding: 0rem 0rem;
   }
 }
 
@@ -10514,6 +10540,10 @@ h6, .h6 {
 #main-banner-carousel .owl-dot:before {
   counter-increment: dots;
   content: counter(dots);
+}
+
+.search {
+  text-align: center;
 }
 
 .world-news,

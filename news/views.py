@@ -3,6 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import *
 import logging
+# -2022.02.22 park_jong_won
+from .fusioncharts import FusionCharts
+from django.db import connection
 
 # -2022.02.22 park_jong_won
 from .fusioncharts import FusionCharts
@@ -71,7 +74,7 @@ def author(req, p_id=1):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     press_query='select * from Press order by p_id'
     sel_press_query=f"""
@@ -185,7 +188,7 @@ def economy(req): # 경제
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -239,7 +242,7 @@ def society(req): # 사회
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -293,7 +296,7 @@ def life(req): # 생활문화
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
@@ -347,14 +350,14 @@ def IT(req): # IT/과학
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
+        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -401,14 +404,14 @@ def world(req): # 세계
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select * 
         from News n 
         inner join N_category_detail ncd on n.cd_id = ncd.cd_id 
         inner join N_summarization_one nso on n.n_id = nso.n_id
-        where ncd.c_id = 105 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
+        where ncd.c_id = 104 and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n.n_id desc
     """
     news_list = News.objects.raw(query)  # models.py Board 클래스의 모든 객체를 board_list에 담음
@@ -456,7 +459,7 @@ def news_post(req, n_id):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
     query = f"""
         select n.n_id, n.n_title, n.nd_img, nc.n_content, n.o_link, ns_content
@@ -516,7 +519,6 @@ def news_post(req, n_id):
 
     return response
 
-    
 
 def index(req):
     data = {}
@@ -551,9 +553,9 @@ def index(req):
             data['session_user_check'] = False
         else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
             data['session_user_check'] = True
-            data['login_massage'] = "환영한다!!!"
+            data['login_massage'] = "환영합니다."
 
-    raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
+    raw = f"select * from News n inner join N_content nc on n.n_id = nc.n_id inner join N_summarization_one nso on n.n_id = nso.n_id  where n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None' order by n_input desc limit 4"
     NC = N_content.objects.raw(raw)
 
     query = []
@@ -570,10 +572,7 @@ def index(req):
         exec(f"data['page_obj{i}'] = page_obj{i}")
         j += 1
 
-        
     data['banners'] = NC
-
-    # data['output'] = individual_press("park_test_1")
     
     return render(req, "index.html", data)
 
@@ -582,14 +581,12 @@ def want_category(c_id):
     
     query = f"""
         select n.n_id, p_id, n.cd_id, n_title, nd_img, n_input, o_link, nso_id, nso_content, c_id 
-        from News n 
+        from News n
         inner join N_summarization_one nso on n.n_id = nso.n_id 
         inner join N_category_detail det on n.cd_id = det.cd_id
         where c_id = {c_id} and n_input != '9999-12-31 00:00:00' and nd_img is not null and nd_img !='None'
         order by n_input desc"""
     return query
-
-
 
 
 def memberinfo(req):
@@ -645,21 +642,20 @@ def login(req): # 로그인
         # 기존(DB)에 있는 Memberinfo 모델과 같은 값인 걸 가져온다.
         user = Memberinfo.objects.raw(query)
 
-        # 비밀번호가 맞는지 확인한다.
-        f_password = user[0].password
-        f_id = user[0].id
-
-        if f_password == psw:
-            #응답 데이터 세션에 값 추가. 수신측 쿠키에 저장됨
-            req.session['user'] = f_id, f_password
-
-            res_data = ("환영합니다.", True)
-            
-        elif f_id != u_id:
+        if len(user) == 0:
             res_data = ("없는 아이디 입니다.", False)
-
         else:
-            res_data = ("비밀번호가 틀렸습니다.", False)
+            f_password = user[0].password
+            f_id = user[0].id
+            # 비밀번호가 맞는지 확인한다.
+            if f_password == psw:
+                #응답 데이터 세션에 값 추가. 수신측 쿠키에 저장됨
+                req.session['user'] = f_id, f_password
+
+                res_data = ("환영합니다.", True)
+
+            else:
+                res_data = ("비밀번호가 틀렸습니다.", False)
 
     return res_data
 
@@ -668,6 +664,69 @@ def logout(req):
     req.session.clear()
 
     return redirect('/')
+
+
+def search(req):
+    data = {}
+    scrollLog(req)
+
+    x_forwarded_for = req.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = req.META.get('REMOTE_ADDR')
+
+    if req.method == 'POST':
+        if 'id' in req.POST.keys() :
+
+            login_massage, session_user_check = login(req)
+            data['login_massage'] = login_massage
+            data['session_user_check'] = session_user_check
+	        
+        elif 'scroll' in req.POST.keys():
+            logger.info(f"POST log [IPaddr = {ip}, scroll = {req.POST['scroll']}, deltaTime = {req.POST['deltaTime']}]")
+
+        elif req.session.get('user', 'test'):
+
+            logout(req)
+            data['session_user_check'] = False
+
+    else : # GET
+        logger.info(f"GET log [IPaddr = {ip},  url = {req.get_full_path()}]]")
+        check = req.session.get('user', "test")
+        if check == "test": # session값이 없는 경우
+            data['session_user_check'] = False
+        else:               # session 값이 있는 경우  == 이미 로그인을 한 상태
+            data['session_user_check'] = True
+            data['login_massage'] = "화형!!!"
+
+    words = req.GET.get('words', '')
+
+    if words != None:
+
+        query = f"""select * 
+                    from News n 
+                    inner join N_content nc on n.n_id = nc.n_id 
+                    inner join N_summarization_one nso on n.n_id = nso.n_id 
+                    where n_title like %s and nd_img is not null and nd_img !='None'
+                    order by n_input desc"""
+
+        result = News.objects.raw(query, ["%"+words+"%"])
+
+        page = req.GET.get('page', '1')  # GET 방식으로 정보를 받아오는 데이터
+        paginator = Paginator(result, '10')  # Paginator(분할될 객체, 페이지 당 담길 객체수)
+        page_obj = paginator.page(page)  # 페이지 번호를 받아 해당 페이지를 리턴 get_page 권장
+
+        data['result'] = result
+        data['page_obj'] = page_obj
+
+    else:
+        pass
+
+    data['words'] = words    
+
+    return render(req, 'search.html', data)
+
 
 def mypage(req):
 

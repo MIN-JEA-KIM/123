@@ -50,36 +50,28 @@
         setTimeout(showClock,1000);
       }
     </script>
-    <script>
-      // var request = new XMLHttpRequest();
-      var start = Date.now();
-      var point = null;
-      window.addEventListener('scroll', function () {
-        let delta = Date.now() - start;
-        point = window.scrollY;
-        if (delta >= 3000) { //3초
-          $.ajax({
-            url: window.location,
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-              'scroll': point,
-              'deltaTime': delta,
-              csrfmiddlewaretoken: '{{ csrf_token }}'
-            },
-            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-          })
-        }
-        start = Date.now()
-      })
-    </script>
   </head>
 
   <body onload="showClock()">
     <div class="container-scroller">
       {% include '_navbar.html' %}
       <div class="container">
-          <div class="world-news">
+
+        <div class="row mt-5">
+
+        </div>
+        <div class="world-news">
+            <div class="row">
+            </div>
+            <div class="search">
+              <form action="." method="get">
+                <!-- name="q"로 지정해야 views.py에서 get 방식으로 q값을 가져온 것과 동일하게 동작 -->
+                <input type="text" name="words" value="{{ words }}" style="width:200px; height:50px"/> 
+                <!-- value=""는 기본적으로 표시되는 항목 이름 -->
+                <input type="submit" value="검색" style="height:50px"/>
+                <br><br>
+              </form>
+            </div>
             {% load mathfilters %}
             <div id="autocontent">
               <div class="page-list" style="margin-top: 2rem;">
@@ -88,7 +80,7 @@
                 {% if page_number >= page_obj.number|add:-5 and page_number <= page_obj.number|add:5 %}
                   {% if page_number == page_obj.number %}
 
-                  {% for news in news_list %}
+                  {% for news in result %}
                     {% if forloop.counter > page_number|add:-1|mul:10 and forloop.counter <= page_number|mul:10 %}
 
                     <div class="row mb-5">
@@ -116,30 +108,30 @@
                 {% endfor %}
                 {% load mathfilters %}
                 <div id="paging">
-                  <ul class="pagination justify-content-center" style="margin-top: 2rem;">
+                  <ul class="pagination justify-content-center" style="text-align:center; margin-top: 2rem;">
                     <li class="page-item disabled">
                     {% if page_obj.has_previous %}
-                      
-                      <a class="abutton" href="?page={{ page_obj.previous_page_number }}" style="text-align:center; width:20%; margin: 5px;">이전</a>
+
+                      <a class="abutton" href="?page={{ words.previous_page_number }}" style="text-align:center; width:20%; margin: 5px;">이전</a>
                     {% endif %}
                     </li>
                     <li class="page-item disabled">
                     {% for page_number in page_obj.paginator.page_range %}
                       {% if page_number >= page_obj.number|add:-2 and page_number <= page_obj.number|add:2 %}
                       <li class="page-item active" aria-current="page" style="text-align:center; width:6%;margin: 5px;">
-                        <a href="?page={{ page_number }}">{{ page_number }}</a>
+                        <a href="?words={{ words }}&page={{ page_number }}">{{ page_number }}</a>
                       </li>
                       {% elif page_number >= page_obj.number|add:-2 and page_number <= page_obj.number|add:2 %}
-                      <li class="page-item active" aria-current="page" style="text-align:center; width:6%; margin: 5px;">
-                        <a href="?page={{ page_number }}">{{ page_number }}</a>
+                      <li class="page-item active" aria-current="page" style="text-align:center; width: 6%; margin: 5px;">
+                        <a href="?words={{ words }}&page={{ page_number }}">{{ page_number }}</a>
                       </li>
                       {% endif %}
                     {% endfor %}
                     </li>
                     <li class="page-item disabled">
                     {% if page_obj.has_next %}
-                      <a class="abutton" href="?page={{ page_obj.next_page_number }}" style="text-align:center; width:20%; margin: 5px;">다음</a>
-                      
+                      <a class="abutton" href="?page={{ words.next_page_number }}" style="text-align:center; width:20%; margin: 5px;">다음</a>
+
                     {% endif %}
                     </li>
                   </ul>
@@ -147,7 +139,7 @@
               </div>
             </div>
           </div>
-        </div>
+      </div>
     </div>
     <!-- container-scroller ends -->
     <!-- partial:../partials/_footer.html -->
